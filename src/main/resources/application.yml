@@ -1,0 +1,10 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 10
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/RETAIL?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: Ly@20060725
