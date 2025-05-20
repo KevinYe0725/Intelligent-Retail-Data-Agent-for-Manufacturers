@@ -1,10 +1,65 @@
+
 server:
   port: 8080
+
 spring:
+  application:
+    name: Intelligent_Retail_Data_Statistics_System
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
   datasource:
     hikari:
       maximum-pool-size: 10
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/RETAIL?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: Ly@20060725
+    driver-class-name: ${kevinye.datasource.driver-class-name}
+    url: jdbc:mysql://${kevinye.datasource.host}:${kevinye.datasource.port}/${kevinye.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${kevinye.datasource.username}
+    password: ${kevinye.datasource.password}
+  data:
+    redis:
+      host: ${kevinye.redis.host}
+      port: ${kevinye.redis.port}
+      password: ${kevinye.redis.password}
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 100
+      database: ${kevinye.redis.database}
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.kevinye.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: debug
+        controller: debug
+
+aliyun:
+  oss:
+    endpoint: ${kevinye.aliyun.oss.endpoint}
+    accessKeyId: ${kevinye.aliyun.oss.accessKeyId}
+    accessKeySecret: ${kevinye.aliyun.oss.accessKeySecret}
+    bucketName: ${kevinye.aliyun.oss.bucketName}
+
+kevinye:
+  jwt:
+    admin-secret-key: ewhfiuqewhfiuqhufuehfuqwefuehffuqhweufhuqoufuqwehfiuhwequfqweiuhfiuqwehfuhqweofuhqwuehfqo
+    admin-ttl: 720000000
+    admin-token-name: token
+    user-secret-key: efqhiuheqwufhwqeiouhfuqwehfouiqhuieofhquwehfiuqewhfiuqhwufqewhfouqhfuiqhouiefhqouehfouqhefou
+    user-ttl: 720000000
+    user-token-name: authentication
+  wechat:
+    appid:  ${kevinye.wechat.appid} # ":" 后面加一个空格
+    secret: ${kevinye.wechat.secret}  # ":" 后面加一个空格
+  ai:
+    appKey: ${kevinye.ai.appKey}
+    appSecret: ${kevinye.ai.appSecret}
