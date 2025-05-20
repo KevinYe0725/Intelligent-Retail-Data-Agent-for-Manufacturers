@@ -53,10 +53,10 @@ kevinye:
   jwt:
     admin-secret-key: ewhfiuqewhfiuqhufuehfuqwefuehffuqhweufhuqoufuqwehfiuhwequfqweiuhfiuqwehfuhqweofuhqwuehfqo
     admin-ttl: 720000000
-    admin-token-name: token
+    admin-token-name: pass
     user-secret-key: efqhiuheqwufhwqeiouhfuqwehfouiqhuieofhquwehfiuqewhfiuqhwufqewhfouqhfuiqhouiefhqouehfouqhefou
     user-ttl: 720000000
-    user-token-name: authentication
+    user-token-name: token
   wechat:
     appid:  ${kevinye.wechat.appid} # ":" 后面加一个空格
     secret: ${kevinye.wechat.secret}  # ":" 后面加一个空格
