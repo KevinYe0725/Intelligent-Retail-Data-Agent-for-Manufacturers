@@ -1,7 +1,6 @@
 package com.kevinye.server.mapper;
 
 import com.kevinye.pojo.Entity.Auditor;
-import com.kevinye.pojo.login.LoginDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
