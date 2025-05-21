@@ -3,7 +3,7 @@ kevinye:
     driver-class-name: com.mysql.cj.jdbc.Driver
     host: localhost #选择数据库所在的IP地址（本机）
     port: 3306
-    database: AI #填写你需要的数据库
+    database: RETAIL #填写你需要的数据库
     username: root #用户名
     password: Ly@20060725 #密码
 
