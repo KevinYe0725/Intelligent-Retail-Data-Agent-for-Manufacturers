@@ -1,4 +1,4 @@
-package com.kevinye.HttpClient;
+package com.kevinye.utils.HttpClient;
 
 import com.alibaba.fastjson2.JSONObject;
 import org.apache.http.NameValuePair;

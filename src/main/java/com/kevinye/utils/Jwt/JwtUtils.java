@@ -1,4 +1,4 @@
-package com.kevinye.Jwt;
+package com.kevinye.utils.Jwt;
 
 
 import io.jsonwebtoken.Claims;

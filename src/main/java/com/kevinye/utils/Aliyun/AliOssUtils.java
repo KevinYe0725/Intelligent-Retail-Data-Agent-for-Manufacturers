@@ -1,4 +1,4 @@
-package com.kevinye.Aliyun;
+package com.kevinye.utils.Aliyun;
 
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;

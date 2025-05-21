@@ -1,4 +1,4 @@
-package com.kevinye.Wechat;
+package com.kevinye.utils.Wechat;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

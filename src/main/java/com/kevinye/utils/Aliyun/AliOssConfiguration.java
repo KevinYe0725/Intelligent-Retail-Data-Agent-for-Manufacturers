@@ -1,4 +1,4 @@
-package com.kevinye.Aliyun;
+package com.kevinye.utils.Aliyun;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;

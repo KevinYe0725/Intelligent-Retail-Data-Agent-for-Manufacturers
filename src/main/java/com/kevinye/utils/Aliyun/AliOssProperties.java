@@ -1,4 +1,4 @@
-package com.kevinye.Aliyun;
+package com.kevinye.utils.Aliyun;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
