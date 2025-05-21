@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 import java.util.List;
 
-@RestController
+@RestController("UserMarketController")
 @Slf4j
 @RequestMapping("/user")
 public class MarketController {
