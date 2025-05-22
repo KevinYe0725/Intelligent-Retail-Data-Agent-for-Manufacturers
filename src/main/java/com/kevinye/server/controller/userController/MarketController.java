@@ -43,4 +43,6 @@ public class MarketController {
         List<GoodVO> goods4Market = marketService.getGoods4Market(marketId, status, period);
         return Result.success(goods4Market);
     }
+
+    
 }
