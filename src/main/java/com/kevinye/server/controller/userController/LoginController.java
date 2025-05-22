@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
-@RestController("AdminLoginController")
+@RestController("UserLoginController")
 @RequestMapping("/user")
 public class LoginController {
-    private LoginService loginService;
+    private final LoginService loginService;
 
     public LoginController(LoginService loginService) {
         this.loginService = loginService;
@@ -25,6 +25,5 @@ public class LoginController {
         LoginVO loginVO = loginService.login(loginDTO);
         return Result.success(loginVO);
     }
-
 
 }
