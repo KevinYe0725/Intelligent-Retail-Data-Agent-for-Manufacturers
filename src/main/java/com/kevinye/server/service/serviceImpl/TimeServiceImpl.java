@@ -5,12 +5,14 @@ import com.kevinye.pojo.constant.PeriodConstant;
 import com.kevinye.pojo.constant.TimeConstant;
 import com.kevinye.server.mapper.TimeMapper;
 import com.kevinye.server.service.TimeService;
+import com.kevinye.server.task.RecommendTasker;
 import com.kevinye.utils.convertor.TimeConvertor;
+import com.kevinye.utils.taskUtil.TaskUtil;
+import com.kevinye.utils.taskUtil.Tasker;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +21,15 @@ import java.util.Map;
 public class TimeServiceImpl implements TimeService {
     private final TimeMapper timeMapper;
     private final TimeConvertor timeConvertor;
-    public TimeServiceImpl(TimeMapper timeMapper, TimeConvertor timeConvertor) {
+    private final Tasker tasker;
+    private final RecommendTasker recommendTasker;
+    private final TaskUtil taskUtil;
+    public TimeServiceImpl(TimeMapper timeMapper, TimeConvertor timeConvertor,Tasker tasker, RecommendTasker recommendTasker, TaskUtil taskUtil) {
         this.timeMapper = timeMapper;
         this.timeConvertor = timeConvertor;
+        this.tasker = tasker;
+        this.recommendTasker = recommendTasker;
+        this.taskUtil = taskUtil;
     }
     @Override
     public Integer getTimePeriod(LocalDateTime now) {
@@ -56,6 +64,20 @@ public class TimeServiceImpl implements TimeService {
         return -1;
     }
 
+    @Override
+    public PeriodSetting getTimeSetting() {
+        return timeMapper.getPeriodSetting();
+    }
+
+    @Override
+    public void updatePeriodSetting(PeriodSetting periodSetting) {
+        timeMapper.updateSetting(periodSetting,1);
+        LocalTime endNightTime = periodSetting.getEndNightTime();
+        String cron = taskUtil.parseToCron(endNightTime);
+        tasker.startTask("PeriodSetting",recommendTasker,cron);
+    }
+
+
     protected static boolean IsInThePeriod(Map<String, Integer> nowTime,
                                            Map<String, Integer> beginTime,
                                            Map<String, Integer> endTime) {
@@ -74,5 +96,7 @@ public class TimeServiceImpl implements TimeService {
 
         return nowSeconds >= beginSeconds && nowSeconds < endSeconds;
     }
+
+
 
 }

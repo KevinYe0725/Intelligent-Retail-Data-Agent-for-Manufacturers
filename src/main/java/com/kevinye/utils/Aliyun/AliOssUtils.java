@@ -53,8 +53,8 @@ public class AliOssUtils {
       }
 
       StringBuilder stringBuilder = new StringBuilder("https://");
-      endpoint = endpoint.replace("http://", "");
-      stringBuilder.append(bucketName).append(".").append(endpoint).append(".").append(objectName);
+      endpoint = endpoint.replace("https://", "");
+      stringBuilder.append(bucketName).append(".").append(endpoint).append("/").append(objectName);
       log.info("文件上传到：{}",stringBuilder.toString());
 
       //返回Url

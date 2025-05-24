@@ -14,7 +14,7 @@ import java.util.UUID;
 @RestController("adminUploadController")
 @RequestMapping("/admin")
 public class UploadController {
-    private AliOssUtils aliOssUtils;
+    private final AliOssUtils aliOssUtils;
     public UploadController(AliOssUtils aliOssUtils) {
         this.aliOssUtils = aliOssUtils;
     }
