@@ -58,4 +58,13 @@ public class MarketServiceImpl implements MarketService {
         }
         return goodVOList;
     }
+
+    /**
+     * 获得所有的Market数据
+     * @return Market数据
+     */
+    @Override
+    public List<Market> getAllMarket() {
+        return marketMapper.getAllMarket();
+    }
 }

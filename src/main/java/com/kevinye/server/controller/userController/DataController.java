@@ -1,8 +1,11 @@
 package com.kevinye.server.controller.userController;
 
 import com.kevinye.pojo.Entity.GoodData;
+import com.kevinye.pojo.VO.RecommendVO;
 import com.kevinye.pojo.result.Result;
+import com.kevinye.server.mapper.DataMapper;
 import com.kevinye.server.service.DataService;
+import com.kevinye.utils.algorithm.MovingAverageUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
@@ -26,8 +29,10 @@ import java.util.List;
 @Slf4j
 public class DataController {
     private final DataService dataService;
-    public DataController(DataService dataService) {
+    private final MovingAverageUtil movingAverageUtil;
+    public DataController(DataService dataService, DataMapper dataMapper, MovingAverageUtil movingAverageUtil) {
         this.dataService = dataService;
+        this.movingAverageUtil = movingAverageUtil;
     }
     @GetMapping("/{marketId}")
     public Result<List<GoodData>> getData(@PathVariable("marketId") Integer marketId, LocalDate date) {
@@ -36,7 +41,7 @@ public class DataController {
     }
 
     @GetMapping("/downloads")
-    public void downloads(HttpServletResponse response, LocalDate date,Integer marketId) throws IOException {
+    public void downloads(HttpServletResponse response, LocalDate date,Integer marketId)  {
         try (Workbook workbook = new XSSFWorkbook()) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
             Sheet sheet = workbook.createSheet(date.format(formatter) + "库存数据表");
@@ -63,6 +68,24 @@ public class DataController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    @GetMapping("/problem")
+    public Result<List<GoodData>> getProblems(LocalDate date,Integer marketId){
+        List<GoodData> problemData4Market = dataService.getProblemData4Market(date, marketId);
+        return Result.success(problemData4Market);
+    }
+
+    @GetMapping("/recommend/{ids}")
+    public Result<List<RecommendVO>> getRecommends(Integer marketId, LocalDate date, @PathVariable List<Integer> ids){
+        List<RecommendVO> recommendsByIds = dataService.getRecommendsByIds(ids, date, marketId);
+        return  Result.success(recommendsByIds);
+    }
+
+    @GetMapping("/recommend")
+    public Result<List<RecommendVO>> getAllRecommends(Integer marketId, LocalDate date){
+        return Result.success(movingAverageUtil.recommendOrders(marketId, date));
 
     }
 
