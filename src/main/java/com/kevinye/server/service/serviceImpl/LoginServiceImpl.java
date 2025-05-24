@@ -1,6 +1,7 @@
 package com.kevinye.server.service.serviceImpl;
 
 import com.aliyun.oss.ServiceException;
+import com.kevinye.pojo.Entity.Admin;
 import com.kevinye.pojo.Entity.Auditor;
 import com.kevinye.pojo.Exception.LoginException;
 import com.kevinye.pojo.constant.JwtConstant;
@@ -46,7 +47,28 @@ public class LoginServiceImpl implements LoginService {
         Map<String,Object> claims = new HashMap<>();
         claims.put(JwtConstant.AUDITOR_ID, auditor.getId());
         String token = JwtUtils.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
-        LoginVO loginVO = new LoginVO(token,auditor.getId());
-        return  loginVO;
+        return new LoginVO(token,auditor.getId());
+    }
+
+    @Override
+    public LoginVO Adminlogin(LoginDTO loginDTO) {
+        if(loginDTO.getUsername() == null || loginDTO.getPassword() == null) {
+            throw new LoginException("输入不得为空");
+        }
+        String username = loginDTO.getUsername();
+        Admin admin = loginMapper.getAdmin(username);
+        if(admin == null){
+            throw new LoginException("账号不存在");
+        }
+        //测试先不使用加密
+//        String password = DigestUtils.md5DigestAsHex(auditor.getPassword().getBytes());
+        String password = admin.getPassword();
+        if(!password.equals(loginDTO.getPassword())) {
+            throw new LoginException("密码错误");
+        }
+        Map<String,Object> claims = new HashMap<>();
+        claims.put(JwtConstant.ADMIN_ID,admin.getId());
+        String token = JwtUtils.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getAdminTtl(), claims);
+        return new LoginVO(token,admin.getId());
     }
 }
