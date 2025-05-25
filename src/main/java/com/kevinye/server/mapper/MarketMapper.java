@@ -1,11 +1,9 @@
 package com.kevinye.server.mapper;
 
 import com.kevinye.pojo.DTO.GoodDataDTO;
-import com.kevinye.pojo.Entity.Good;
-import com.kevinye.pojo.Entity.GoodForMarket;
-import com.kevinye.pojo.Entity.Market;
-import com.kevinye.pojo.Entity.Storage;
+import com.kevinye.pojo.Entity.*;
 import com.kevinye.pojo.VO.GoodsVO;
+import com.kevinye.pojo.VO.WarningVO;
 import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDate;
@@ -51,4 +49,42 @@ public interface MarketMapper {
 
     @Select("select good_name,id as goodId from goods where good_name like concat('%',#{goodName},'%')")
     List<GoodsVO> getAllGoodChoice(String goodName);
+
+    @Select("select id as problemId, market_id , auditor_id , content, datetime, image from problem where market_id = #{marketId}")
+    List<Problem> getProblemStorage4Market(Integer marketId);
+
+    @Select("select * from supermarket where id = #{id}")
+    Market getMarketById(Integer marketId);
+
+    @Select("SELECT" +
+            "    s.good_id,\n" +
+            "    g.good_name,\n" +
+            "    s.initial_goods,\n" +
+            "    a.auditor_name,\n" +
+            "    s.assignment_status\n" +
+            "FROM\n" +
+            "    storage s,\n" +
+            "    goods g,\n" +
+            "    auditor_storage_date asd,\n" +
+            "    auditor a\n" +
+            "WHERE\n" +
+            "    s.market_id = #{marketId}\n" +
+            "    AND s.date = #{date}\n" +
+            "    AND s.status = 1\n" +
+            "    AND s.good_id = g.id\n" +
+            "    AND asd.storageId = s.id\n" +
+            "    AND a.id = asd.auditorId\n ")
+    List<WarningVO> getWarningGoods(Integer marketId, LocalDate date);
+
+    @Select("select count(*) from storage where date between #{beginDate} and #{endDate} and good_id = #{goodId} and market_id = #{marketId} and status = 1")
+    Integer getCount(Integer goodId,LocalDate beginDate, LocalDate endDate, Integer marketId);
+
+    @Select("select noon_goods from storage  where id = market_id and date = #{date}")
+    Integer getNoonRemaining(Integer marketId, LocalDate date);
+
+    @Select("select afternoon_goods from storage  where id = market_id and date = #{date}")
+    Integer getAfterNoonRemaining(Integer marketId, LocalDate date);
+
+    @Select("select night_goods from storage  where id = market_id and date = #{date}")
+    Integer getNightRemaining(Integer marketId, LocalDate date);
 }

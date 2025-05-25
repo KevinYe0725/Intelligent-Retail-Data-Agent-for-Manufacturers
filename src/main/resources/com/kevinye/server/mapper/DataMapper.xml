@@ -3,4 +3,12 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.kevinye.server.mapper.DataMapper">
 
+    <update id="updateWarningStatus">
+        update storage set
+        status = 1
+        where good_id in
+        <foreach collection="problems" item="problem" separator="," close=")" open="(">
+             #{problem.goodId}
+        </foreach>
+    </update>
 </mapper>

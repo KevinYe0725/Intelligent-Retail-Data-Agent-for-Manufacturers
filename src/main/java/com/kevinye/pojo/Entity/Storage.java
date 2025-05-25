@@ -22,4 +22,6 @@ public class Storage {
     private Integer period;
     private Integer status;
     private String image;
+    private Integer assignmentStatus;
+
 }

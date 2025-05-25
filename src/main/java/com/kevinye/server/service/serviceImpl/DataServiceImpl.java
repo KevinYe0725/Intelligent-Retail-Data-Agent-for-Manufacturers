@@ -69,6 +69,8 @@ public class DataServiceImpl implements DataService {
                     }
                 }
             }
+            dataMapper.refreshWarningStatus(marketId,date);
+            dataMapper.updateWarningStatus(problemList,date,marketId);
             return problemList;
         }
         return problemList;

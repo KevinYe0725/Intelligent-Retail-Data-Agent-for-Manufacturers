@@ -35,4 +35,10 @@ public interface DataMapper {
 
     @Update("update recommendation set recommend_factor = #{factor} where good_id = #{goodId} and date = #{date} and market_id = #{marketId}")
     void updateFactor(double factor, int marketId, LocalDate now, Integer goodId);
+
+
+    void updateWarningStatus(List<GoodData> problemList, LocalDate date, Integer marketId);
+
+    @Update("update storage set status = 0 where market_id = #{marketId} and date = #{date}")
+    void refreshWarningStatus(Integer marketId, LocalDate date);
 }

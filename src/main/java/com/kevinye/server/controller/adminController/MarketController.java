@@ -1,18 +1,26 @@
 package com.kevinye.server.controller.adminController;
 
 import com.kevinye.pojo.DTO.GoodDataDTO;
-import com.kevinye.pojo.Entity.Good;
-import com.kevinye.pojo.Entity.GoodData;
-import com.kevinye.pojo.Entity.GoodForMarket;
-import com.kevinye.pojo.Entity.GoodInfo;
+import com.kevinye.pojo.Entity.*;
 import com.kevinye.pojo.VO.GoodsVO;
+import com.kevinye.pojo.VO.WarningVO;
 import com.kevinye.pojo.result.Result;
+import com.kevinye.server.service.DataService;
 import com.kevinye.server.service.MarketService;
 import com.kevinye.server.service.TimeService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController("AdminMarketController")
@@ -21,9 +29,11 @@ import java.util.List;
 public class MarketController {
     private final MarketService marketService;
     private final TimeService timeService;
-    public MarketController(MarketService marketService, TimeService timeService) {
+    private final DataService dataService;
+    public MarketController(MarketService marketService, TimeService timeService, DataService dataService) {
         this.marketService = marketService;
         this.timeService = timeService;
+        this.dataService = dataService;
     }
 
     /**
@@ -63,5 +73,50 @@ public class MarketController {
     public Result<List<GoodsVO>> getAllGoodChoices(String goodName){
         List<GoodsVO> allGoods = marketService.getAllGoods(goodName);
         return Result.success(allGoods);
+    }
+
+    @GetMapping("/problems")
+    public Result<List<Problem>> getProblem(Integer marketId){
+        List<Problem> problems = marketService.getProblems(marketId);
+        return Result.success(problems);
+    }
+
+    @GetMapping("/download")
+    public void download(HttpServletResponse response, Integer marketId,LocalDate date) throws IOException {
+        Market marketById = marketService.getMarketById(marketId);
+        try (Workbook workbook = new XSSFWorkbook()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+            Sheet sheet = workbook.createSheet(marketById.getMarketName()+date.format(formatter) + "库存数据表");
+            Row row = sheet.createRow(0);
+            row.createCell(0).setCellValue("品类");
+            row.createCell(1).setCellValue("采购订单");
+            row.createCell(2).setCellValue("中午剩余库存");
+            row.createCell(3).setCellValue("下午剩余库存");
+            row.createCell(4).setCellValue("夜晚剩余库存");
+            List<GoodData> goodDataList = dataService.getData4Market(marketId, date);
+            int i = 1;
+            for (GoodData goodData : goodDataList) {
+                Row dataRow = sheet.createRow(i++);
+                dataRow.createCell(0).setCellValue(goodData.getGoodName());
+                dataRow.createCell(1).setCellValue(goodData.getInitialGoods());
+                dataRow.createCell(2).setCellValue(goodData.getNoonGoods()==null?"":String.valueOf(goodData.getNoonGoods()));
+                dataRow.createCell(3).setCellValue(goodData.getAfternoonGoods()==null?"":String.valueOf(goodData.getAfternoonGoods()));
+                dataRow.createCell(4).setCellValue(goodData.getNightGoods()==null?"":String.valueOf(goodData.getNightGoods()));
+            }
+
+            String fileName = URLEncoder.encode(date.format(formatter) + "库存数据表" + ".xlsx", StandardCharsets.UTF_8);
+            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            workbook.write(response.getOutputStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    @GetMapping("/warning")
+    public Result<List<WarningVO>> getWarning(Integer marketId,LocalDate date){
+        List<WarningVO> warningList = marketService.getWarningList(marketId, date);
+        return Result.success(warningList);
     }
 }

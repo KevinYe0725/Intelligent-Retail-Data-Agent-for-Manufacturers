@@ -78,6 +78,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
 
+
+
     protected static boolean IsInThePeriod(Map<String, Integer> nowTime,
                                            Map<String, Integer> beginTime,
                                            Map<String, Integer> endTime) {

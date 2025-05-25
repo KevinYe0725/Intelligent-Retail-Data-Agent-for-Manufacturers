@@ -5,14 +5,20 @@ import com.kevinye.pojo.Entity.*;
 import com.kevinye.pojo.VO.GoodVO;
 import com.kevinye.pojo.VO.GoodsVO;
 import com.kevinye.pojo.VO.MarketVO;
+import com.kevinye.pojo.VO.WarningVO;
 import com.kevinye.pojo.constant.PeriodConstant;
 import com.kevinye.server.mapper.GoodMapper;
 import com.kevinye.server.mapper.MarketMapper;
+import com.kevinye.server.mapper.TimeMapper;
 import com.kevinye.server.service.MarketService;
+import com.kevinye.server.service.TimeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +27,11 @@ public class MarketServiceImpl implements MarketService {
 
     private final MarketMapper marketMapper;
     private final GoodMapper goodMapper;
-    public MarketServiceImpl(MarketMapper marketMapper, GoodMapper goodMapper) {
+    private final TimeMapper timeMapper;
+    public MarketServiceImpl(MarketMapper marketMapper, GoodMapper goodMapper, TimeMapper timeMapper) {
         this.marketMapper = marketMapper;
         this.goodMapper = goodMapper;
+        this.timeMapper = timeMapper;
     }
 
     @Override
@@ -134,6 +142,66 @@ public class MarketServiceImpl implements MarketService {
     @Override
     public List<GoodsVO> getAllGoods(String goodName) {
         return marketMapper.getAllGoodChoice(goodName);
+    }
+
+    @Override
+    public List<Problem> getProblems(Integer marketId) {
+        return marketMapper.getProblemStorage4Market(marketId);
+    }
+
+    @Override
+    public Market getMarketById(Integer marketId) {
+
+        return marketMapper.getMarketById(marketId);
+    }
+
+    @Override
+    public List<WarningVO> getWarningList(Integer marketId, LocalDate date) {
+        Integer period = PeriodConstant.NIGHT;
+        if(date.equals(LocalDate.now()) ){
+            period = getRemainingPeriod(LocalTime.now());
+        }
+        if(period == -1){
+            return new ArrayList<>();
+        }
+        List<WarningVO> warningGoods = marketMapper.getWarningGoods(marketId, date);
+        for (WarningVO warningGood : warningGoods) {
+            LocalDate beginDate = date.minusDays(7);
+            Integer recentTimes = marketMapper.getCount(warningGood.getGoodId(), beginDate, date, marketId);
+            warningGood.setRecentTimes(recentTimes);
+            Integer remaining = 0;
+            String per = null;
+            if(period.equals(PeriodConstant.NOON)){
+                remaining = marketMapper.getNoonRemaining(marketId,date);
+                per = "中午";
+            }else if(period.equals(PeriodConstant.AFTERNOON)){
+                remaining =  marketMapper.getAfterNoonRemaining(marketId,date);
+                per = "下午";
+            }else if(period.equals(PeriodConstant.NIGHT)) {
+                remaining = marketMapper.getNightRemaining(marketId,date);
+                per = "晚上";
+            }
+            Double rate = (double)warningGood.getInitialGoods()/(double)remaining;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+
+            String time = date.format(formatter)+" "+per;
+            warningGood.setTime(time);
+            warningGood.setRemainingRate(rate);
+        }
+        return warningGoods;
+
+    }
+
+    public Integer getRemainingPeriod(LocalTime now) {
+        PeriodSetting periodSetting = timeMapper.getPeriodSetting();
+        if (now.isAfter(periodSetting.getEndNightTime())){
+            return PeriodConstant.NIGHT;
+        }else if (now.isBefore(periodSetting.getEndAfternoonTime())){
+            return PeriodConstant.AFTERNOON;
+        }else if (now.isBefore(periodSetting.getEndNoonTime())){
+            return PeriodConstant.NOON;
+        }
+        return -1;
     }
 
 }

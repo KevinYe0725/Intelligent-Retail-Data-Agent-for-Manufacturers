@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Problem {
-    private Integer id;
+    private Integer problemId;
     private Integer auditorId;
     private Integer marketId;
     private String content;
