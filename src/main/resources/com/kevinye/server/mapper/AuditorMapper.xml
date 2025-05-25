@@ -14,7 +14,7 @@
         select * from auditor
         <where>
             <if test="name != null and name != ''">
-                auditor_name = concat('%',name,'%');
+                auditor_name like concat('%',name,'%');
             </if>
             <if test="marketIds != null and marketIds.size() > 0">
             and market_id in

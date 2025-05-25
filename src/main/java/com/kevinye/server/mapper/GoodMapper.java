@@ -23,4 +23,7 @@ public interface GoodMapper {
     void deleteGoodById(Integer goodId);
 
     void insertGoodList(List<Good> goodList);
+
+    @Select("select id as goodId, good_name, image from goods where good_name = #{goodName}")
+    Good getGoodByName(String goodName);
 }

@@ -8,7 +8,7 @@
         select  * from supermarket
         <where>
             <if test="marketName!= null and marketName !='' ">
-                market_name = concat('%',marketName,'%')
+                market_name like concat('%',marketName,'%')
             </if>
         </where>
     </select>

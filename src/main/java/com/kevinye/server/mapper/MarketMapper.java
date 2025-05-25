@@ -1,9 +1,12 @@
 package com.kevinye.server.mapper;
 
+import com.kevinye.pojo.DTO.GoodDataDTO;
+import com.kevinye.pojo.Entity.Good;
+import com.kevinye.pojo.Entity.GoodForMarket;
 import com.kevinye.pojo.Entity.Market;
 import com.kevinye.pojo.Entity.Storage;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import com.kevinye.pojo.VO.GoodsVO;
+import org.apache.ibatis.annotations.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,4 +39,16 @@ public interface MarketMapper {
 
 
     List<Market> getMarketByName(String marketName);
+
+    @Insert("insert storage (market_id, good_id, initial_goods, date) values (#{marketId},#{goodId},#{initialGoods},#{date})")
+    void insertGood(GoodForMarket goodByName);
+
+    @Update("update storage set initial_goods = #{initialGoods},noon_goods = #{noonGoods},afternoon_goods = #{afternoonGoods},night_goods = #{nightGoods} where market_id = #{marketId} and date = #{date} and good_id = #{goodId}")
+    void updateGoodInformation(GoodDataDTO goodDataDTO);
+
+    @Delete("delete from storage where good_id = #{goodId} and market_id = #{marketId} and date = #{date}")
+    void deleteGoodInformationFromMarket(Integer marketId, Integer goodId, LocalDate date);
+
+    @Select("select good_name,id as goodId from goods where good_name like concat('%',#{goodName},'%')")
+    List<GoodsVO> getAllGoodChoice(String goodName);
 }

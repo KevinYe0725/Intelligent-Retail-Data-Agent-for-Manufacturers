@@ -74,4 +74,5 @@ public class GoodController {
         return Result.success("添加成功");
     }
 
+
 }

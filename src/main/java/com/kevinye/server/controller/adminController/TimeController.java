@@ -25,6 +25,9 @@ public class TimeController {
 
     @GetMapping
     public Result<Integer> getPeriod(LocalDateTime dateTime){
+        if(dateTime == null){
+            dateTime = LocalDateTime.now();
+        }
         Integer period = timeService.getTimePeriod(dateTime);
         return Result.success(period);
     }

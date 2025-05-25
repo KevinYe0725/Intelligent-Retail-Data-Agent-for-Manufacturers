@@ -9,17 +9,11 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Storage {
-    private Integer id;
-    private Integer marketId;
+public class GoodForMarket {
     private Integer goodId;
+    private Integer marketId;
     private String goodName;
-    private Integer initialGoods;
-    private Integer noonGoods;
-    private Integer afternoonGoods;
-    private Integer nightGoods;
     private LocalDate date;
-    private Integer period;
-    private Integer status;
+    private Integer initialGoods;
     private String image;
 }
