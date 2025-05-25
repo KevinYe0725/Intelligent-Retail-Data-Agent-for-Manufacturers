@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevinye.server.mapper.GoodMapper">
+
+    <insert id="insertGoodList">
+        insert into goods (id, good_name, image) VALUES
+            <foreach collection="goodList" item="good" separator=",">
+                (#{good.goodId},#{good.goodName},#{good.image})
+            </foreach>
+    </insert>
+</mapper>

@@ -5,14 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Good {
-    private Integer GoodId;
+@AllArgsConstructor
+public class GoodInfo {
+    private Integer goodId;
     private String goodName;
     private String image;
-    public Good(String goodName,String image) {
-        this.goodName = goodName;
-        this.image = image;
-    }
+    private Integer totalNumber;
+    private Integer totalMarket;
 }
