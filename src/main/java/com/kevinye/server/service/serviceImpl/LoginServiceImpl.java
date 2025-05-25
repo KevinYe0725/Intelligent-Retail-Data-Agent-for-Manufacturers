@@ -21,8 +21,8 @@ import java.util.Map;
 @Service
 @Slf4j
 public class LoginServiceImpl implements LoginService {
-    private LoginMapper loginMapper;
-    private JwtProperties jwtProperties;
+    private final LoginMapper loginMapper;
+    private final JwtProperties jwtProperties;
     public LoginServiceImpl(LoginMapper loginMapper,JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
         this.loginMapper = loginMapper;
@@ -45,13 +45,13 @@ public class LoginServiceImpl implements LoginService {
             throw new LoginException("密码错误");
         }
         Map<String,Object> claims = new HashMap<>();
-        claims.put(JwtConstant.AUDITOR_ID, auditor.getId());
+        claims.put(JwtConstant.AUDITOR_ID, auditor.getAuditorId());
         String token = JwtUtils.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
-        return new LoginVO(token,auditor.getId());
+        return new LoginVO(token,auditor.getAuditorId());
     }
 
     @Override
-    public LoginVO Adminlogin(LoginDTO loginDTO) {
+    public LoginVO AdminLogin(LoginDTO loginDTO) {
         if(loginDTO.getUsername() == null || loginDTO.getPassword() == null) {
             throw new LoginException("输入不得为空");
         }
@@ -68,7 +68,7 @@ public class LoginServiceImpl implements LoginService {
         }
         Map<String,Object> claims = new HashMap<>();
         claims.put(JwtConstant.ADMIN_ID,admin.getId());
-        String token = JwtUtils.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getAdminTtl(), claims);
+        String token = JwtUtils.createJWT(jwtProperties.getAdminSecretKey(), jwtProperties.getAdminTtl(), claims);
         return new LoginVO(token,admin.getId());
     }
 }

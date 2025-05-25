@@ -3,4 +3,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.kevinye.server.mapper.MarketMapper">
 
+
+    <select id="getMarketByName" resultType="com.kevinye.pojo.Entity.Market">
+        select  * from supermarket
+        <where>
+            <if test="marketName!= null and marketName !='' ">
+                market_name = concat('%',marketName,'%')
+            </if>
+        </where>
+    </select>
 </mapper>

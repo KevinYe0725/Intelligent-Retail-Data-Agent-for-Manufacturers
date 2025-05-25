@@ -24,7 +24,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         if(!(handler instanceof HandlerMethod)) {
             return true;
         }
-        String token = request.getParameter(jwtProperties.getAdminTokenName());
+        String token = request.getHeader(jwtProperties.getAdminTokenName());
         try{
             log.info("开始验证token:{}",token);
             Claims claims = JwtUtils.parseJWT(jwtProperties.getAdminSecretKey(), token);

@@ -53,7 +53,7 @@ kevinye:
   jwt:
     admin-secret-key: ewhfiuqewhfiuqhufuehfuqwefuehffuqhweufhuqoufuqwehfiuhwequfqweiuhfiuqwehfuhqweofuhqwuehfqo
     admin-ttl: 720000000
-    admin-token-name: pass
+    admin-token-name: Authorization
     user-secret-key: efqhiuheqwufhwqeiouhfuqwehfouiqhuieofhquwehfiuqewhfiuqhwufqewhfouqhfuiqhouiefhqouehfouqhefou
     user-ttl: 720000000
     user-token-name: token

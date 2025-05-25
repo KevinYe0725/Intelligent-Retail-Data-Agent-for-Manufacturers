@@ -33,4 +33,7 @@ public interface MarketMapper {
 
     @Select("select * from supermarket")
     List<Market> getAllMarket();
+
+
+    List<Market> getMarketByName(String marketName);
 }

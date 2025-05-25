@@ -21,6 +21,6 @@ public class LoginController {
 
     @PostMapping("/login")
     public Result<LoginVO> login(@RequestBody LoginDTO loginDTO) {
-        return Result.success(loginService.Adminlogin(loginDTO));
+        return Result.success(loginService.AdminLogin(loginDTO));
     }
 }
