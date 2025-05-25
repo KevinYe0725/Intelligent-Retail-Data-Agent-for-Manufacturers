@@ -16,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
-@Slf4j
 public class AuditorController {
     private final AuditorService auditorService;
     private final MarketService marketService;
