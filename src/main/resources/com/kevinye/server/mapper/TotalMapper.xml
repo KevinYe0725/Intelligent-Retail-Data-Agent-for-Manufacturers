@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevinye.server.mapper.TotalMapper">
+    <select id="getTopGoodList" resultType="com.kevinye.pojo.VO.TopGoodVO">
+        select
+            s.good_id,
+            g.good_name,
+            sum(s.initial_goods) as total_number
+            from
+                storage s
+                join goods g on s.good_id = g.id
+            where
+                s.date
+                    between
+                    #{beginDate}
+                    and
+                    #{endDate}
+            group by
+                s.good_id
+            order by
+                total_number desc
+    </select>
+    <select id="getTopMarketList" resultType="com.kevinye.pojo.VO.TopMarketVO">
+        select
+            s.market_id,
+            m.market_name,
+            sum(s.initial_goods) as total_number
+        from
+            storage s
+            join supermarket m on market_id = m.id
+        where
+            s.date
+                between
+                #{beginDate}
+                and
+                #{endDate}
+        group by
+            s.market_id
+        order by
+            total_number desc
+    </select>
+</mapper>
