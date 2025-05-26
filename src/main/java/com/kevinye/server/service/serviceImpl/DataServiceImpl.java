@@ -1,10 +1,12 @@
 package com.kevinye.server.service.serviceImpl;
 
 import com.kevinye.pojo.Entity.GoodData;
+import com.kevinye.pojo.Entity.Market;
 import com.kevinye.pojo.Entity.PeriodSetting;
 import com.kevinye.pojo.Entity.WarningLine;
 import com.kevinye.pojo.VO.RecommendVO;
 import com.kevinye.server.mapper.DataMapper;
+import com.kevinye.server.mapper.MarketMapper;
 import com.kevinye.server.service.DataService;
 import com.kevinye.server.service.TimeService;
 import com.kevinye.utils.algorithm.MovingAverageUtil;
@@ -22,10 +24,12 @@ public class DataServiceImpl implements DataService {
     private  final DataMapper dataMapper;
     private  final TimeService timeService;
     private  final MovingAverageUtil movingAverageUtil;
-    public DataServiceImpl(DataMapper dataMapper,TimeService timeService,MovingAverageUtil movingAverageUtil) {
+    private  final MarketMapper marketMapper;
+    public DataServiceImpl(DataMapper dataMapper,TimeService timeService,MovingAverageUtil movingAverageUtil,MarketMapper marketMapper) {
         this.dataMapper = dataMapper;
         this.timeService = timeService;
         this.movingAverageUtil = movingAverageUtil;
+        this.marketMapper = marketMapper;
     }
 
     @Override
@@ -86,6 +90,37 @@ public class DataServiceImpl implements DataService {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<Market> getAllMarkets(String marketName) {
+        return marketMapper.getMarketByName(marketName);
+    }
+
+    @Override
+    public Market getMarketById(Integer id) {
+        return marketMapper.getMarketById(id);
+    }
+
+    @Override
+    public void addNewMarket(Market market) {
+        marketMapper.addNewMarket(market);
+    }
+
+    @Override
+    public void deleteMarkets(List<Integer> ids) {
+        List<Integer> information4Market = marketMapper.getInformation4Market(ids);
+        for (Integer number : information4Market) {
+            if(number != 0){
+                throw new RuntimeException("有历史数据的market不可删除");
+            }
+        }
+        marketMapper.deleteMarkets(ids);
+    }
+
+    @Override
+    public void updateMarket(Market market) {
+        dataMapper.updateMarket(market);
     }
 }
 

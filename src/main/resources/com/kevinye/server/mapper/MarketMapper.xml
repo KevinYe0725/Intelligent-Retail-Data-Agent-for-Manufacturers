@@ -2,7 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.kevinye.server.mapper.MarketMapper">
+    <insert id="importNewStorage">
+        insert into storage ( market_id, good_id, initial_goods,  date)
+        values
+            <foreach collection="storageList" item="storage" separator=",">
+                (#{storage.marketId}),#{storage.goodId},#{storage.initialGood},#{storage.date})
+            </foreach>
+    </insert>
+    <insert id="importNewMarkets">
+        insert into supermarket (market_name, address, phone, person, email) values
+            <foreach collection="marketList" separator="," item="market" >
+                (#{market.marketName},#{market.address},#{market.phone},#{market.person},#{market.email})
+            </foreach>
+    </insert>
 
+
+    <delete id="deleteMarkets">
+        delete from
+                   supermarket
+               where
+                   id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
 
     <select id="getMarketByName" resultType="com.kevinye.pojo.Entity.Market">
         select  * from supermarket
@@ -50,6 +73,18 @@
             join goods  on s.good_id = goods.id
             join auditor_storage_date on s.id = auditor_storage_date.storageId
             join auditor on auditor_storage_date.auditorId = auditor.id
+    </select>
+    <select id="getInformation4Market" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            storage
+        where market_id in
+        <foreach collection="ids" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        group by
+            market_id
     </select>
 
 </mapper>

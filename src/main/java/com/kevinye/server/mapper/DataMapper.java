@@ -1,6 +1,7 @@
 package com.kevinye.server.mapper;
 
 import com.kevinye.pojo.Entity.GoodData;
+import com.kevinye.pojo.Entity.Market;
 import com.kevinye.pojo.Entity.WarningLine;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -41,4 +42,13 @@ public interface DataMapper {
 
     @Update("update storage set status = 0 where market_id = #{marketId} and date = #{date}")
     void refreshWarningStatus(Integer marketId, LocalDate date);
+
+    @Update("update supermarket set image = #{image}," +
+                                   "market_name = #{marketName}," +
+                                   "address = #{address}," +
+                                   "person = #{person}," +
+                                   "phone = #{phone}," +
+                                   "email = #{email} " +
+                                "where id = #{id}")
+    void updateMarket(Market market);
 }

@@ -162,4 +162,15 @@ public interface MarketMapper {
     List<Storage> getStorageByIds(List<Integer> storageIds);
 
     List<MarketData> getMarketDataOfDate(Integer marketId, LocalDate date);
+
+    @Insert("insert into supermarket (id, market_name, image, address, phone, person, email) VALUE (#{id},#{marketName},#{image},#{address},#{phone},#{person},#{email})")
+    void addNewMarket(Market market);
+
+    List<Integer> getInformation4Market(List<Integer> ids);
+
+    void deleteMarkets(List<Integer> ids);
+
+    void importNewStorage(List<Storage> storageList);
+
+    void importNewMarkets(List<Market> marketList);
 }

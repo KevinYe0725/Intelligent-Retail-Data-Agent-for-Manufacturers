@@ -25,4 +25,10 @@ public class Storage {
     private String image;
     private Integer assignmentStatus;
 
+    public Storage(Integer marketId, Integer goodId, Integer initialGoods, LocalDate date) {
+        this.marketId = marketId;
+        this.goodId = goodId;
+        this.initialGoods = initialGoods;
+        this.date = date;
+    }
 }
