@@ -12,4 +12,44 @@
             </if>
         </where>
     </select>
+    <select id="getStorageByIds" resultType="com.kevinye.pojo.Entity.Storage">
+        SELECT
+        s.id,
+        s.market_id,
+        m.market_name,
+        s.good_id,
+        g.good_name,
+        s.initial_goods,
+        s.noon_goods,
+        s.afternoon_goods,
+        s.night_goods,
+        s.date,
+        s.status,
+        s.assignment_status
+        FROM
+        storage s
+        JOIN supermarket m ON s.market_id = m.id
+        JOIN goods g ON s.good_id = g.id
+        WHERE
+        s.id IN
+        <foreach collection="storageIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <select id="getMarketDataOfDate" resultType="com.kevinye.pojo.Entity.MarketData">
+        select s.good_id ,
+               goods.good_name,
+               goods.image ,
+               initial_goods,
+               noon_goods,
+               afternoon_goods,
+               night_goods,
+               auditor.auditor_name
+        from
+            storage s
+            join goods  on s.good_id = goods.id
+            join auditor_storage_date on s.id = auditor_storage_date.storageId
+            join auditor on auditor_storage_date.auditorId = auditor.id
+    </select>
+
 </mapper>

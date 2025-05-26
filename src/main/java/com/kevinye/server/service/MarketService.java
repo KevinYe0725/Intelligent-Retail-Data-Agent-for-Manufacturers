@@ -32,4 +32,6 @@ public interface MarketService {
     Market getMarketById(Integer marketId);
 
     List<WarningVO> getWarningList(Integer marketId, LocalDate date);
+
+    List<MarketData> getMarketDataOfDate(Integer marketId, LocalDate date);
 }

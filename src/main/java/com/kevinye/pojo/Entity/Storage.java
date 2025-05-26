@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class Storage {
     private Integer id;
     private Integer marketId;
+    private String MarketName;
     private Integer goodId;
     private String goodName;
     private Integer initialGoods;

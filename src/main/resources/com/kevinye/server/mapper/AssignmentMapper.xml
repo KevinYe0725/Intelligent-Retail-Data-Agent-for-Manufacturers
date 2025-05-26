@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kevinye.server.mapper.AssignmentMapper">
+    <insert id="addAssignmentList">
+        insert into  assignment (content, market_id, good_id, date) VALUES
+        <foreach collection="assignmentList" item="assignment" separator=",">
+            (#{assignment.content},#{assignment.marketId},#{assignment.goodId},#{assignment.date})
+        </foreach>
+    </insert>
+    <select id="getAllAssignmentByIds" resultType="com.kevinye.pojo.Entity.Assignment">
+        select
+            id as assignmentId,
+            content,
+            market_id,
+            good_id,
+            status,
+            date
+        from
+            assignment
+        where
+            date = #{date}
+          and
+            id in
+        <foreach collection="ids" separator="," item="id" open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

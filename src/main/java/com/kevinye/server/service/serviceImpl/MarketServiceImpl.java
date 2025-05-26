@@ -192,6 +192,14 @@ public class MarketServiceImpl implements MarketService {
 
     }
 
+    @Override
+    public List<MarketData> getMarketDataOfDate(Integer marketId, LocalDate date) {
+        if (marketId == null||date==null) {
+            throw new RuntimeException("不得有数据为空");
+        }
+        return marketMapper.getMarketDataOfDate(marketId, date);
+    }
+
     public Integer getRemainingPeriod(LocalTime now) {
         PeriodSetting periodSetting = timeMapper.getPeriodSetting();
         if (now.isAfter(periodSetting.getEndNightTime())){

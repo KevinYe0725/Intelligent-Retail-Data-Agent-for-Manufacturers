@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class WarningVO {
+    private Integer storageId;
     private Integer goodId;
     private String goodName;
     private Integer initialGoods;

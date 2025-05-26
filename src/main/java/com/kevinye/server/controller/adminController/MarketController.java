@@ -119,4 +119,10 @@ public class MarketController {
         List<WarningVO> warningList = marketService.getWarningList(marketId, date);
         return Result.success(warningList);
     }
+
+    @GetMapping("/data/{marketId}")
+    public Result<List<MarketData>> getGoodData4Market(@PathVariable Integer marketId ,LocalDate date){
+        List<MarketData> marketDataOfDate = marketService.getMarketDataOfDate(marketId, date);
+        return Result.success(marketDataOfDate);
+    }
 }
