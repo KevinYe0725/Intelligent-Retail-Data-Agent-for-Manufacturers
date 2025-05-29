@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class TopMarketVO {
     private Integer marketId;
     private String marketName;
-    private Integer totalNumber;
+    private Integer totalSales;
 }

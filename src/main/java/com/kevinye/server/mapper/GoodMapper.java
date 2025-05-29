@@ -13,10 +13,10 @@ import java.util.List;
 @Mapper
 public interface GoodMapper {
 
-    @Select("select g.id as good_id ,g.good_name,g.image ,count(*) as total_market,sum(s.initial_goods) as total_number  from goods g ,storage s where s.date = #{date} and s.good_id = g.id group by g.id")
+    @Select("select g.id as good_id ,g.good_name,g.image ,g.price,count(*) as total_market,sum(s.initial_goods) as total_number  from goods g ,storage s where s.date = #{date} and s.good_id = g.id group by g.id")
     List<GoodInfo> getAllGoodInformation(LocalDate date);
 
-    @Insert("insert into goods (id,good_name, image) values (#{goodId},#{goodName},#{image});")
+    @Insert("insert into goods (id,good_name, image,price) values (#{goodId},#{goodName},#{image},#{price});")
     void insertNewGood(Good good);
 
     @Delete("delete from goods where id = #{goodId}")
@@ -24,6 +24,6 @@ public interface GoodMapper {
 
     void insertGoodList(List<Good> goodList);
 
-    @Select("select id as goodId, good_name, image from goods where good_name = #{goodName}")
+    @Select("select id as goodId, good_name, image, price from goods where good_name = #{goodName}")
     Good getGoodByName(String goodName);
 }

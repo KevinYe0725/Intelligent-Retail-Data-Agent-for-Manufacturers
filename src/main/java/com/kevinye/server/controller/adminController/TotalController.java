@@ -1,10 +1,13 @@
 package com.kevinye.server.controller.adminController;
 
+import com.kevinye.pojo.Entity.DayData;
+import com.kevinye.pojo.Entity.MonthData;
 import com.kevinye.pojo.VO.TopGoodVO;
 import com.kevinye.pojo.VO.TopMarketVO;
 import com.kevinye.pojo.result.Result;
 import com.kevinye.server.service.TotalService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,5 +34,17 @@ public class TotalController {
     public Result<List<TopMarketVO>> getSortedMarketByNumber(LocalDate date) {
         List<TopMarketVO> sortedMarketByNumber = totalService.getSortedMarketByNumber(date);
         return Result.success(sortedMarketByNumber);
+    }
+
+    @GetMapping("/month")
+    public Result<List<DayData>> getMonthData(LocalDate date, Integer goodId) {
+        List<DayData> monthData = totalService.getMonthData(date, goodId);
+        return Result.success(monthData);
+    }
+
+    @GetMapping("/year")
+    public Result<List<MonthData>> getYearData(LocalDate date,Integer goodId){
+        List<MonthData> yearData = totalService.getYearData(date, goodId);
+        return Result.success(yearData);
     }
 }

@@ -13,4 +13,5 @@ public class GoodInfo {
     private String image;
     private Integer totalNumber;
     private Integer totalMarket;
+    private Double price;
 }

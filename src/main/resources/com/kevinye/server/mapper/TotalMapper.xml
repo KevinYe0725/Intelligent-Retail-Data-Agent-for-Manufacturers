@@ -6,7 +6,7 @@
         select
             s.good_id,
             g.good_name,
-            sum(s.initial_goods) as total_number
+            sum(s.initial_goods*g.price) as total_sales #这里先用sales来存储数量，后面在service类直接重写
             from
                 storage s
                 join goods g on s.good_id = g.id
@@ -19,16 +19,17 @@
             group by
                 s.good_id
             order by
-                total_number desc
+                total_sales desc
     </select>
     <select id="getTopMarketList" resultType="com.kevinye.pojo.VO.TopMarketVO">
         select
             s.market_id,
             m.market_name,
-            sum(s.initial_goods) as total_number
+            sum(s.initial_goods*g.price) as total_sales
         from
             storage s
             join supermarket m on market_id = m.id
+            join goods g on s.good_id = g.id
         where
             s.date
                 between
@@ -38,6 +39,35 @@
         group by
             s.market_id
         order by
-            total_number desc
+            total_sales desc
+    </select>
+    <select id="getMonthData" resultType="com.kevinye.pojo.Entity.DayData">
+        SELECT
+        s.date,
+        SUM(s.initial_goods * g.price) AS day_sales
+        FROM
+        storage s
+        INNER JOIN goods g ON s.good_id = g.id
+        WHERE
+        <if test="goodId != null ">
+            s.good_id = #{goodId} AND
+        </if>
+        s.date BETWEEN #{beginDate} AND #{endDate}
+        GROUP BY s.date
+    </select>
+    <select id="getYearData" resultType="com.kevinye.pojo.Entity.MonthData">
+        select
+            MONTH(s.date) as month,
+            sum(s.initial_goods*g.price) as month_sales
+        from
+            storage s
+            inner join goods g on s.good_id = g.id
+        WHERE
+            <if test="goodId != null">
+                s.good_id = #{goodId} and
+            </if>
+        s.date between #{beginDate} and #{endDate}
+        group by
+            MONTH(s.date)
     </select>
 </mapper>

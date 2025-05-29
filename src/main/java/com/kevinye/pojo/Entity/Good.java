@@ -11,8 +11,10 @@ public class Good {
     private Integer GoodId;
     private String goodName;
     private String image;
-    public Good(String goodName,String image) {
+    private Double price;
+    public Good(String goodName,String image,Double price) {
         this.goodName = goodName;
         this.image = image;
+        this.price = price;
     }
 }

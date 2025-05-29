@@ -1,5 +1,7 @@
 package com.kevinye.server.service;
 
+import com.kevinye.pojo.Entity.DayData;
+import com.kevinye.pojo.Entity.MonthData;
 import com.kevinye.pojo.VO.TopGoodVO;
 import com.kevinye.pojo.VO.TopMarketVO;
 
@@ -10,4 +12,8 @@ public interface TotalService {
     List<TopGoodVO> getSortedGoodByNumber(LocalDate date);
 
     List<TopMarketVO> getSortedMarketByNumber(LocalDate date);
+
+    List<DayData> getMonthData(LocalDate date, Integer goodId);
+
+    List<MonthData> getYearData(LocalDate date, Integer goodId);
 }

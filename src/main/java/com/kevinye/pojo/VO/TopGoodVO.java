@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TopGoodVO {
-    Integer goodId;
-    String goodName;
-    Integer totalNumber;
+    private Integer goodId;
+    private String goodName;
+    private Double totalSales;
 }

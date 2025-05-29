@@ -110,15 +110,7 @@ public class MarketServiceImpl implements MarketService {
             goodformarket.setGoodId(goodByName.getGoodId());
             marketMapper.insertGood(goodformarket);
         }else {
-            if (goodformarket.getImage()==null){
-                throw new RuntimeException("image不可为空");
-            }else{
-                Good good = new Good(goodformarket.getGoodName(), goodformarket.getImage());
-                goodMapper.insertNewGood(good);
-                goodByName = goodMapper.getGoodByName(goodformarket.getGoodName());
-                goodformarket.setGoodId(goodByName.getGoodId());
-                marketMapper.insertGood(goodformarket);
-            }
+            throw new RuntimeException("该商品不存在，请去商品管理界面添加");
         }
     }
 
