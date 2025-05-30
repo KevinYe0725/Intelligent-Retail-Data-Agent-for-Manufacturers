@@ -125,4 +125,10 @@ public class MarketController {
         List<MarketData> marketDataOfDate = marketService.getMarketDataOfDate(marketId, date);
         return Result.success(marketDataOfDate);
     }
+
+    @GetMapping("/month")
+    public Result<List<DayData>> getMonthData4Market(Integer marketId,LocalDate date,Integer goodId){
+        List<DayData> monthData = marketService.getMonthData(marketId, date, goodId);
+        return Result.success(monthData);
+    }
 }

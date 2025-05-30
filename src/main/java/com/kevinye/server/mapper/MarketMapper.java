@@ -173,4 +173,6 @@ public interface MarketMapper {
     void importNewStorage(List<Storage> storageList);
 
     void importNewMarkets(List<Market> marketList);
+
+    List<DayData> getMonthData(LocalDate beginDate, LocalDate endDate, Integer marketId, Integer goodId);
 }

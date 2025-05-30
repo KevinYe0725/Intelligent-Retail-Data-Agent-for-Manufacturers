@@ -86,5 +86,23 @@
         group by
             market_id
     </select>
+    <select id="getMonthData" resultType="com.kevinye.pojo.Entity.DayData">
+        select
+            date,
+            sum(initial_goods * g.price ) as day_sales
+        from
+            storage s
+            inner join goods g on s.good_id = g.id
+        where
+            date between #{beginDate} and #{endDate}
+        and
+            market_id = #{marketId}
+
+            <if test="goodId != null ">
+                and    good_id = #{goodId}
+            </if>
+        group  by
+            date
+    </select>
 
 </mapper>

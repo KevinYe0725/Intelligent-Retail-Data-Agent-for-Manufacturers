@@ -1,6 +1,8 @@
 package com.kevinye.server.controller.adminController;
 
 import com.kevinye.pojo.Entity.DayData;
+import com.kevinye.pojo.Entity.GoodGrowth;
+import com.kevinye.pojo.Entity.MarketGrowth;
 import com.kevinye.pojo.Entity.MonthData;
 import com.kevinye.pojo.VO.TopGoodVO;
 import com.kevinye.pojo.VO.TopMarketVO;
@@ -46,5 +48,17 @@ public class TotalController {
     public Result<List<MonthData>> getYearData(LocalDate date,Integer goodId){
         List<MonthData> yearData = totalService.getYearData(date, goodId);
         return Result.success(yearData);
+    }
+
+    @GetMapping("/growth/market")
+    public Result<List<MarketGrowth>> getMarketData(LocalDate date){
+        List<MarketGrowth> growthOfMarkets = totalService.getGrowthOfMarkets(date);
+        return Result.success(growthOfMarkets);
+    }
+
+    @GetMapping("/growth/good")
+    public Result<List<GoodGrowth>> getGoodData(LocalDate date){
+        List<GoodGrowth> growthOfGoods = totalService.getGrowthOfGoods(date);
+        return Result.success(growthOfGoods);
     }
 }

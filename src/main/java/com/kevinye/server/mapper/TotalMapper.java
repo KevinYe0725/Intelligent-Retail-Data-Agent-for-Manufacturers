@@ -1,6 +1,8 @@
 package com.kevinye.server.mapper;
 
 import com.kevinye.pojo.Entity.DayData;
+import com.kevinye.pojo.Entity.GoodGrowth;
+import com.kevinye.pojo.Entity.MarketGrowth;
 import com.kevinye.pojo.Entity.MonthData;
 import com.kevinye.pojo.VO.TopGoodVO;
 import com.kevinye.pojo.VO.TopMarketVO;
@@ -21,4 +23,8 @@ public interface TotalMapper {
     List<DayData> getMonthData(LocalDate beginDate,LocalDate endDate, Integer goodId);
 
     List<MonthData> getYearData(LocalDate beginDate,LocalDate endDate, Integer goodId);
+
+    List<MarketGrowth> getMonthSales4Markets(LocalDate beginDate, LocalDate endDate);
+
+    List<GoodGrowth> getMonthSales4Goods(LocalDate beginDate, LocalDate endDate);
 }

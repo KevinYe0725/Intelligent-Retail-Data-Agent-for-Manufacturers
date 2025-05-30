@@ -70,4 +70,35 @@
         group by
             MONTH(s.date)
     </select>
+    <select id="getMonthSales4Markets" resultType="com.kevinye.pojo.Entity.MarketGrowth">
+        select
+            market_id,
+            supermarket.market_name,
+            sum(initial_goods*g.price) as month_sales
+        from
+            storage s
+            inner join goods g on s.good_id = g.id
+            inner join supermarket on supermarket.id = s.market_id
+        where
+            s.date between #{beginDate} and #{endDate}
+        group by
+            s.market_id
+        order by
+            s.market_id
+    </select>
+    <select id="getMonthSales4Goods" resultType="com.kevinye.pojo.Entity.GoodGrowth">
+        select
+            good_id,
+            g.good_name,
+            sum(initial_goods*price)
+        from
+            storage s
+            inner join goods g on s.good_id = g.id
+        where
+            s.date between #{beginDate} and #{endDate}
+        group by
+            good_id
+        order by
+            good_id
+    </select>
 </mapper>

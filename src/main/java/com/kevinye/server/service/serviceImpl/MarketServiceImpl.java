@@ -192,6 +192,13 @@ public class MarketServiceImpl implements MarketService {
         return marketMapper.getMarketDataOfDate(marketId, date);
     }
 
+    @Override
+    public List<DayData> getMonthData(Integer marketId, LocalDate date, Integer goodId) {
+
+        LocalDate beginDate = date.minusMonths(1).withDayOfMonth(1);
+        return marketMapper.getMonthData(beginDate,date,marketId,goodId);
+    }
+
     public Integer getRemainingPeriod(LocalTime now) {
         PeriodSetting periodSetting = timeMapper.getPeriodSetting();
         if (now.isAfter(periodSetting.getEndNightTime())){
