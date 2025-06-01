@@ -50,8 +50,8 @@ public class AuditorController {
         return Result.success(b ? "删除成功" : "删除失败");
     }
 
-    @PostMapping("/admin/staff/import")
-    public Result<String> importAuditors(String excelUrl){
+    @PostMapping("/staff/import")
+    public Result<String> importAuditors(@RequestBody String excelUrl){
         if(!excelUrl.startsWith("https://kevinye-web.oss-cn-hangzhou.aliyuncs.com.")){
             return Result.success("不可上传非白名单url");
         }

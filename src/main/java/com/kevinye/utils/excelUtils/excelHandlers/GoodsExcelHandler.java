@@ -20,15 +20,14 @@ public class GoodsExcelHandler implements ExcelHandler {
     public void handleSheet(List<List<String>> sheet) {
         List<String> rowFirst = sheet.getFirst();
         int indexOfName = rowFirst.indexOf(GoodConstant.GOOD_NAME);
-        int indexOfImage = rowFirst.indexOf(GoodConstant.IMAGE);
         int indexOfPrice = rowFirst.indexOf(GoodConstant.PRICE);
-        if(indexOfName != -1 && indexOfImage != -1) {
+        if(indexOfName != -1 ) {
             throw new IllegalArgumentException("Excel表头缺少必要字段！");
         }
         List<Good> goodList = new ArrayList<>();
         for (int i = 1; i < sheet.size(); i++) {
             List<String> row = sheet.get(i);
-            Good good = new Good(row.get(indexOfName),row.get(indexOfImage),Double.valueOf(row.get(indexOfPrice)));
+            Good good = new Good(row.get(indexOfName),Double.valueOf(row.get(indexOfPrice)));
             goodList.add(good);
         }
         goodMapper.insertGoodList(goodList);

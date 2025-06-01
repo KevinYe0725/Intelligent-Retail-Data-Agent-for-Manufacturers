@@ -6,6 +6,7 @@ import com.kevinye.pojo.VO.AuditorVO;
 import com.kevinye.server.mapper.AuditorMapper;
 import com.kevinye.server.mapper.MarketMapper;
 import com.kevinye.server.service.AuditorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class AuditorServiceImpl implements AuditorService {
     private final MarketMapper marketMapper;
     private final AuditorMapper auditorMapper;
@@ -34,7 +36,7 @@ public class AuditorServiceImpl implements AuditorService {
             List<Auditor> allAuditors = auditorMapper.getAllAuditors(name, marketIds);
 
             for (Auditor auditor : allAuditors) {
-                AuditorVO auditorVO = new AuditorVO(auditor.getAuditorId(),marketName,auditor.getAuditorName(),auditor.getPhone(),auditor.getEmail(),auditor.getUsername(),auditor.getPassword() );
+                AuditorVO auditorVO = new AuditorVO(auditor.getAuditorId(),auditor.getMarketId(),marketName,auditor.getAuditorName(),auditor.getPhone(),auditor.getEmail(),auditor.getUsername(),auditor.getPassword() );
                 auditorVOS.add(auditorVO);
             }
         }else {
@@ -44,11 +46,11 @@ public class AuditorServiceImpl implements AuditorService {
             Map<Integer,String> matcher = new HashMap<>();
             markets.forEach(market -> matcher.put(market.getId(),market.getMarketName()));
             for (Auditor auditor : allAuditors) {
-                AuditorVO auditorVO = new AuditorVO(auditor.getAuditorId(),matcher.get(auditor.getMarketId()),auditor.getAuditorName(),auditor.getPhone(),auditor.getEmail(),auditor.getUsername(),auditor.getPassword() );
+                AuditorVO auditorVO = new AuditorVO(auditor.getAuditorId(),auditor.getMarketId(),matcher.get(auditor.getMarketId()),auditor.getAuditorName(),auditor.getPhone(),auditor.getEmail(),auditor.getUsername(),auditor.getPassword() );
                 auditorVOS.add(auditorVO);
             }
         }
-
+        log.info("AuditorVOS:{} ", auditorVOS);
         return  auditorVOS;
     }
 
@@ -66,6 +68,7 @@ public class AuditorServiceImpl implements AuditorService {
         if (auditor == null) {
             return false;
         }
+        log.info("员工信息: {}", auditor);
         deleteAuditorById(auditor.getAuditorId());
         addAuditor(auditor);
         return true;

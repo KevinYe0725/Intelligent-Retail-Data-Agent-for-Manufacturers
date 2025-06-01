@@ -6,5 +6,5 @@ public class AuditorConstant {
     public static final String PHONE = "电话号码";
     public static final String EMAIL = "电子邮件";
     public static final String PASSWORD = "密码";
-    public static final String MARKET_NAME = "商店";
+    public static final String MARKET_NAME = "商店名称";
 }

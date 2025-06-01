@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuditorVO {
-    private Integer id;
+    private Integer auditorId;
+    private Integer marketId;
     private String marketName;
     private String auditorName;
     private String phone;

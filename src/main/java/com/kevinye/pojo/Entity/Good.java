@@ -17,4 +17,8 @@ public class Good {
         this.image = image;
         this.price = price;
     }
+    public Good(String goodName,Double price) {
+        this.goodName = goodName;
+        this.price = price;
+    }
 }

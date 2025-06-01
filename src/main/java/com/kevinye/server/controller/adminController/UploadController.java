@@ -20,6 +20,23 @@ public class UploadController {
     }
     @PostMapping("/statistics/sheet")
     public Result<String> uploadPhoto(@RequestParam("file") MultipartFile file) {
+        String excelUrl = null;
+        try {
+            String suffix ="" ;
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null) {
+                suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = UUID.randomUUID().toString().replace("-","")+ suffix;
+            excelUrl = aliOssUtils.upload(file.getBytes(), fileName);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Result.success(excelUrl);
+    }
+
+    @PostMapping("/upload")
+    public Result<String> upload(@RequestParam("file") MultipartFile file) {
         String imageUrl = null;
         try {
             String suffix ="" ;

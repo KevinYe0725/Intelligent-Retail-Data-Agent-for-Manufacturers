@@ -11,7 +11,7 @@
     </insert>
 
     <select id="getAllAuditors" resultType="com.kevinye.pojo.Entity.Auditor">
-        select * from auditor
+        select id as auditorId, auditor_name, username, phone, email, market_id, password from auditor
         <where>
             <if test="name != null and name != ''">
                 auditor_name like concat('%',name,'%');
