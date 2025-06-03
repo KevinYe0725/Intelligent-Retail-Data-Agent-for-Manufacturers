@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 public class Problem {
     private Integer problemId;
     private Integer auditorId;
+    private String auditorName;
     private Integer marketId;
     private String content;
     private String image;

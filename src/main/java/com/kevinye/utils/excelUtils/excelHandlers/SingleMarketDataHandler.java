@@ -25,7 +25,7 @@ public class SingleMarketDataHandler implements ExcelHandler {
     @Override
     public void handleSheet(List<List<String>> sheet) {
         List<String> rowFirst = sheet.getFirst();
-        String MarketName = rowFirst.getFirst();
+        String MarketName = sheet.get(1).getFirst();
         List<Market> market = marketMapper.getMarketByName(MarketName);
         Integer marketId = market.getFirst().getId();
         int indexOfDate = rowFirst.indexOf(MarketDataConstant.DATE);
@@ -33,8 +33,9 @@ public class SingleMarketDataHandler implements ExcelHandler {
         int indexOfGoodName = rowFirst.indexOf(MarketDataConstant.Good_NAME);
         List<String> rowSecond = sheet.get(1);
         String s = rowSecond.get(indexOfDate);
-        LocalDate date = LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+        DateTimeFormatter parser = DateTimeFormatter.ofPattern("yyyy.M.d");
+        LocalDate date = LocalDate.parse(s, parser);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         date = LocalDate.parse(date.format(formatter), formatter);
         List<Storage> storageList = new ArrayList<>();
         for(int i = 1; i < sheet.size(); i++ ) {

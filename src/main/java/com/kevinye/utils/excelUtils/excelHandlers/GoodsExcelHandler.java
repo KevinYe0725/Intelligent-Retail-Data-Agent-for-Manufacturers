@@ -21,7 +21,7 @@ public class GoodsExcelHandler implements ExcelHandler {
         List<String> rowFirst = sheet.getFirst();
         int indexOfName = rowFirst.indexOf(GoodConstant.GOOD_NAME);
         int indexOfPrice = rowFirst.indexOf(GoodConstant.PRICE);
-        if(indexOfName != -1 ) {
+        if(indexOfName == -1 ) {
             throw new IllegalArgumentException("Excel表头缺少必要字段！");
         }
         List<Good> goodList = new ArrayList<>();

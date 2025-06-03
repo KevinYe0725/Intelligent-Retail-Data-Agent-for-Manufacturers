@@ -47,6 +47,7 @@ public class TotalController {
     @GetMapping("/year")
     public Result<List<MonthData>> getYearData(LocalDate date,Integer goodId){
         List<MonthData> yearData = totalService.getYearData(date, goodId);
+        log.info("年数据{}",yearData);
         return Result.success(yearData);
     }
 

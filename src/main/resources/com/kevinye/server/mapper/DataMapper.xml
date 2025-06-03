@@ -11,4 +11,32 @@
              #{problem.goodId}
         </foreach>
     </update>
+    <select id="getAllMarketsInfo" resultType="com.kevinye.pojo.Entity.MarketInfo">
+        select sm.id,
+               market_name,
+               sm.image,
+               address,
+               phone,
+               person,
+               email,
+        CASE
+        when  count(s.id) > 0 then count(s.id)
+        else 0
+        end as warning_status ,
+        CASE
+        WHEN COUNT(p.id) > 0 THEN count(p.id)
+        ELSE 0
+        END AS problem_status
+        FROM supermarket sm
+        LEFT JOIN problem p
+        ON p.market_id = sm.id
+        AND p.datetime >= CONCAT(#{date}, ' 00:00:00')
+        AND p.datetime &lt; CONCAT(#{date}, ' 23:59:59')
+        LEFT JOIN storage s
+        ON s.market_id = sm.id
+        AND s.date =#{date}
+        AND s.status = 1
+        group by
+            sm.id
+    </select>
 </mapper>

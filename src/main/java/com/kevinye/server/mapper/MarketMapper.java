@@ -74,7 +74,7 @@ public interface MarketMapper {
      * @param goodName 货品名字部分字段
      * @return 货品基础信息
      */
-    @Select("select good_name,id as goodId from goods where good_name like concat('%',#{goodName},'%')")
+
     List<GoodsVO> getAllGoodChoice(String goodName);
 
     /**
@@ -82,7 +82,20 @@ public interface MarketMapper {
      * @param marketId 商店
      * @return 历史问题
      */
-    @Select("select id as problemId, market_id , auditor_id , content, datetime, image from problem where market_id = #{marketId}")
+    @Select("SELECT " +
+            "  p.id AS problemId, " +
+            "  p.market_id, " +
+            "  p.auditor_id, " +
+            "  a.auditor_name AS auditorName, " +   // 新增：审计员名称
+            "  p.content, " +
+            "  p.datetime, " +
+            "  p.image " +
+            "FROM problem p " +
+            "INNER JOIN auditor a ON p.auditor_id = a.id " +
+            "WHERE p.market_id = #{marketId} " +
+            "order by datetime desc"
+
+)
     List<Problem> getProblemStorage4Market(Integer marketId);
 
     /**

@@ -29,6 +29,7 @@ public class AssignmentController {
     @GetMapping
     public Result<List<Assignment>> getAllAssignment(LocalDate date,String marketName){
         List<Assignment> allAssignment = assignmentService.getAllAssignment(date, marketName);
+        log.info("任务列表：{}", allAssignment);
         return Result.success(allAssignment);
     }
 

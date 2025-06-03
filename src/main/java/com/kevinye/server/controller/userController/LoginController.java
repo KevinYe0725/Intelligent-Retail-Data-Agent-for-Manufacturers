@@ -20,9 +20,10 @@ public class LoginController {
         this.loginService = loginService;
     }
     @PostMapping("/login")
-    public Result<LoginVO> login( LoginDTO loginDTO) {
+    public Result<LoginVO> login(@RequestBody LoginDTO loginDTO) {
         log.info("用户开始登陆");
         LoginVO loginVO = loginService.login(loginDTO);
+        log.info("返回{}", loginVO);
         return Result.success(loginVO);
     }
 

@@ -1,6 +1,7 @@
 package com.kevinye.server.controller.adminController;
 
 import com.kevinye.pojo.Entity.Auditor;
+import com.kevinye.pojo.Entity.ImportRequest;
 import com.kevinye.pojo.VO.AuditorVO;
 import com.kevinye.pojo.VO.MarketVO;
 import com.kevinye.pojo.result.Result;
@@ -51,10 +52,9 @@ public class AuditorController {
     }
 
     @PostMapping("/staff/import")
-    public Result<String> importAuditors(@RequestBody String excelUrl){
-        if(!excelUrl.startsWith("https://kevinye-web.oss-cn-hangzhou.aliyuncs.com.")){
-            return Result.success("不可上传非白名单url");
-        }
+    public Result<String> importAuditors(@RequestBody ImportRequest rep){
+        String excelUrl = rep.getExcelUrl();
+
         try {
             ExcelUtils.downloadAndAnalyze(excelUrl,auditorExcelHandler);
         } catch (IOException e) {

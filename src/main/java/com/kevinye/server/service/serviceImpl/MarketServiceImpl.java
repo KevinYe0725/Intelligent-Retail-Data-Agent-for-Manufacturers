@@ -55,20 +55,33 @@ public class MarketServiceImpl implements MarketService {
         List<GoodVO> goodVOList = new ArrayList<>();
         if(period.equals(PeriodConstant.NOON)){
             for (Storage storage : storages) {
-                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getInitialGoods(),storage.getStatus(),storage.getImage());
+                if (storage.getNoonGoods() == null) {
+                    GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getInitialGoods(),storage.getStatus(),storage.getImage());
+                    goodVOList.add(goodVO);
+                }
+                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getNoonGoods(),storage.getStatus(),storage.getImage());
                 goodVOList.add(goodVO);
             }
         }else if(period.equals(PeriodConstant.AFTERNOON)){
             for (Storage storage : storages) {
-                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getNoonGoods(),storage.getStatus(),storage.getImage());
+                if (storage.getAfternoonGoods() == null) {
+                    GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getNoonGoods(),storage.getStatus(),storage.getImage());
+                    goodVOList.add(goodVO);
+                }
+                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getAfternoonGoods(),storage.getStatus(),storage.getImage());
                 goodVOList.add(goodVO);
             }
         }else if(period.equals(PeriodConstant.NIGHT)){
             for (Storage storage : storages) {
-                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getAfternoonGoods(),storage.getStatus(),storage.getImage());
+                if(storage.getNightGoods()==null) {
+                    GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getAfternoonGoods(),storage.getStatus(),storage.getImage());
+                    goodVOList.add(goodVO);
+                }
+                GoodVO goodVO = new GoodVO(storage.getGoodId(),storage.getGoodName(),storage.getNightGoods(),storage.getStatus(),storage.getImage());
                 goodVOList.add(goodVO);
             }
         }
+
         return goodVOList;
     }
 

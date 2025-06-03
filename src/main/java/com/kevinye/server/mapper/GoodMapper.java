@@ -13,7 +13,22 @@ import java.util.List;
 @Mapper
 public interface GoodMapper {
 
-    @Select("select g.id as good_id ,g.good_name,g.image ,g.price,count(*) as total_market,sum(s.initial_goods) as total_number  from goods g ,storage s where s.date = #{date} and s.good_id = g.id group by g.id")
+    @Select("SELECT\n" +
+            "  g.id             AS good_id,\n" +
+            "  g.good_name,\n" +
+            "  g.image,\n" +
+            "  g.price,\n" +
+            "  COUNT(s.market_id)                 AS total_market,\n" +
+            "  COALESCE(SUM(s.initial_goods*g.price), 0)  AS total_number\n" +
+            "FROM goods g\n" +
+            "LEFT JOIN storage s\n" +
+            "  ON s.good_id = g.id\n" +
+            "  AND s.date = #{date} \n" +
+            "GROUP BY\n" +
+            "  g.id,\n" +
+            "  g.good_name,\n" +
+            "  g.image,\n" +
+            "  g.price;\n")
     List<GoodInfo> getAllGoodInformation(LocalDate date);
 
     @Insert("insert into goods (id,good_name, image,price) values (#{goodId},#{goodName},#{image},#{price});")

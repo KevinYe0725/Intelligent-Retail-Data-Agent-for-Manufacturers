@@ -1,7 +1,7 @@
 package com.kevinye.utils.taskUtil;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledFuture;
 @Component
 public class Tasker {
     private final TaskScheduler scheduler;
-    public Tasker(TaskScheduler scheduler) {
+    public Tasker(@Qualifier("taskScheduler") TaskScheduler scheduler) {
         this.scheduler = scheduler;
     }
 

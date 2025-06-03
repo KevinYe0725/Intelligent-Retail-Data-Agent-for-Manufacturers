@@ -6,9 +6,11 @@ import com.kevinye.pojo.constant.TimeConstant;
 import com.kevinye.server.mapper.TimeMapper;
 import com.kevinye.server.service.TimeService;
 import com.kevinye.server.task.RecommendTasker;
+import com.kevinye.server.task.WarningTasker;
 import com.kevinye.utils.convertor.TimeConvertor;
 import com.kevinye.utils.taskUtil.TaskUtil;
 import com.kevinye.utils.taskUtil.Tasker;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,18 +21,19 @@ import java.util.Map;
 
 @Service
 public class TimeServiceImpl implements TimeService {
-    private final TimeMapper timeMapper;
-    private final TimeConvertor timeConvertor;
-    private final Tasker tasker;
-    private final RecommendTasker recommendTasker;
-    private final TaskUtil taskUtil;
-    public TimeServiceImpl(TimeMapper timeMapper, TimeConvertor timeConvertor,Tasker tasker, RecommendTasker recommendTasker, TaskUtil taskUtil) {
-        this.timeMapper = timeMapper;
-        this.timeConvertor = timeConvertor;
-        this.tasker = tasker;
-        this.recommendTasker = recommendTasker;
-        this.taskUtil = taskUtil;
-    }
+    @Autowired
+    private  TimeMapper timeMapper;
+    @Autowired
+    private  TimeConvertor timeConvertor;
+    @Autowired
+    private  Tasker tasker;
+    @Autowired
+    private  RecommendTasker recommendTasker;
+    @Autowired
+    private  WarningTasker warningTasker;
+    @Autowired
+    private  TaskUtil taskUtil;
+
     @Override
     public Integer getTimePeriod(LocalDateTime now) {
         Map<String, Integer> nowTime = timeConvertor.dateTime2Number(String.valueOf(now));
@@ -71,10 +74,22 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public void updatePeriodSetting(PeriodSetting periodSetting) {
-        timeMapper.updateSetting(periodSetting,1);
+        timeMapper.updateSetting(periodSetting);
         LocalTime endNightTime = periodSetting.getEndNightTime();
         String cron = taskUtil.parseToCron(endNightTime);
-        tasker.startTask("PeriodSetting",recommendTasker,cron);
+        tasker.stopTask("PeriodSetting");
+        tasker.stopTask("NoonWarning");
+        tasker.stopTask("AfternoonWarning");
+        tasker.stopTask("NightWarning");
+
+        String cronNoon = taskUtil.parseToCron(periodSetting.getStartAfternoonTime());
+        tasker.startTask("NoonWarning", warningTasker, cronNoon);
+        String cronAfternoon = taskUtil.parseToCron(periodSetting.getEndAfternoonTime());
+        tasker.startTask("AfternoonWarning", warningTasker, cronAfternoon);
+        String cronNight = taskUtil.parseToCron(periodSetting.getEndNightTime());
+        tasker.startTask("NightWarning", warningTasker, cronNight);
+        tasker.startTask("PeriodSetting",recommendTasker,cronNight);
+
     }
 
 

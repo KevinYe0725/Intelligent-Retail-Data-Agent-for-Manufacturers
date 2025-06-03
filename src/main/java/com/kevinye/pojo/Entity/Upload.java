@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoodGrowth {
-    private Integer goodId;
-    private String goodName;
-    private Double goodSales;
-    private Double growth;
+public class Upload {
+    private String excelUrl;
+    private Integer type;
 }

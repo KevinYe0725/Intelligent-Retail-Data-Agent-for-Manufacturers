@@ -6,7 +6,7 @@
         insert into storage ( market_id, good_id, initial_goods,  date)
         values
             <foreach collection="storageList" item="storage" separator=",">
-                (#{storage.marketId}),#{storage.goodId},#{storage.initialGood},#{storage.date})
+                (#{storage.marketId},#{storage.goodId},#{storage.initialGoods},#{storage.date})
             </foreach>
     </insert>
     <insert id="importNewMarkets">
@@ -31,7 +31,7 @@
         select  * from supermarket
         <where>
             <if test="marketName!= null and marketName !='' ">
-                market_name like concat('%',marketName,'%')
+                market_name like concat('%',#{marketName},'%')
             </if>
         </where>
     </select>
@@ -73,6 +73,7 @@
             join goods  on s.good_id = goods.id
             join auditor_storage_date on s.id = auditor_storage_date.storageId
             join auditor on auditor_storage_date.auditorId = auditor.id
+        where date = #{date}
     </select>
     <select id="getInformation4Market" resultType="java.lang.Integer">
         select
@@ -103,6 +104,17 @@
             </if>
         group  by
             date
+    </select>
+    <select id="getAllGoodChoice" resultType="com.kevinye.pojo.VO.GoodsVO">
+        select
+            good_name,
+            id as goodId
+        from goods
+        <where>
+            <if test="goodName!=null and goodName!= ''">
+                good_name like concat('%',#{goodName},'%')
+            </if>
+        </where>
     </select>
 
 </mapper>

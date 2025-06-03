@@ -2,17 +2,16 @@ package com.kevinye.server.controller.adminController;
 
 import com.kevinye.pojo.Entity.Good;
 import com.kevinye.pojo.Entity.GoodInfo;
+import com.kevinye.pojo.Entity.ImportRequest;
 import com.kevinye.pojo.result.Result;
 import com.kevinye.server.service.GoodService;
 import com.kevinye.utils.excelUtils.ExcelUtils;
 import com.kevinye.utils.excelUtils.excelHandlers.GoodsExcelHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController("AdminGoodController")
@@ -46,11 +45,11 @@ public class GoodController {
     }
 
     @DeleteMapping
-    public Result<String> deleteGood(Integer id) {
-        if (id == null) {
+    public Result<String> deleteGood(Integer goodId) {
+        if (goodId == null) {
             return  Result.error("id不得为空");
         }
-        goodService.deleteGoodById(id);
+        goodService.deleteGoodById(goodId);
         return Result.success("删除成功");
     }
     @PutMapping
@@ -62,10 +61,8 @@ public class GoodController {
         return Result.success("更新成功");
     }
     @PostMapping("/import")
-    public Result<String> importGood(String excelUrl) {
-        if(!excelUrl.startsWith("https://kevinye-web.oss-cn-hangzhou.aliyuncs.com.")){
-            return Result.success("不可上传非白名单url");
-        }
+    public Result<String> importGood(@RequestBody ImportRequest req) {
+        String excelUrl = req.getExcelUrl();
         try {
             ExcelUtils.downloadAndAnalyze(excelUrl,goodsExcelHandler);
         } catch (IOException e) {

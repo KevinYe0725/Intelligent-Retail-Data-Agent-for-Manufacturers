@@ -4,9 +4,9 @@
 <mapper namespace="com.kevinye.server.mapper.GoodMapper">
 
     <insert id="insertGoodList">
-        insert into goods (id, good_name, image) VALUES
+        insert into goods ( good_name,price) VALUES
             <foreach collection="goodList" item="good" separator=",">
-                (#{good.goodId},#{good.goodName},#{good.image})
+                (#{good.goodName},#{good.price})
             </foreach>
     </insert>
 </mapper>

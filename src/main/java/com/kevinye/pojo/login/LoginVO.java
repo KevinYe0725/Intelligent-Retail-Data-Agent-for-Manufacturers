@@ -10,4 +10,9 @@ import lombok.NoArgsConstructor;
 public class LoginVO {
     private String token;
     private Integer auditorId;
+    private Integer marketId;
+    public LoginVO(String token, Integer auditorId) {
+        this.token = token;
+        this.auditorId = auditorId;
+    }
 }

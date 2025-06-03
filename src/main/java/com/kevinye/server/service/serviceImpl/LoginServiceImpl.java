@@ -47,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
         Map<String,Object> claims = new HashMap<>();
         claims.put(JwtConstant.AUDITOR_ID, auditor.getAuditorId());
         String token = JwtUtils.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
-        return new LoginVO(token,auditor.getAuditorId());
+        return new LoginVO(token,auditor.getAuditorId(),auditor.getMarketId());
     }
 
     @Override

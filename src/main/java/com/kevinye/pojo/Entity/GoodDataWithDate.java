@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GoodGrowth {
-    private Integer goodId;
+public class GoodDataWithDate {
+    private Integer goodId;;
     private String goodName;
-    private Double goodSales;
-    private Double growth;
+    private Integer initialGoods;
+    private  Integer noonGoods;
+    private  Integer afternoonGoods;
+    private  Integer nightGoods;
 }

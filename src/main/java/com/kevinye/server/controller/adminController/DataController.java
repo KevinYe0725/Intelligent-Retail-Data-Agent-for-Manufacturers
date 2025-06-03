@@ -1,18 +1,23 @@
 package com.kevinye.server.controller.adminController;
 
+import com.kevinye.pojo.Entity.ImportRequest;
 import com.kevinye.pojo.Entity.Market;
+import com.kevinye.pojo.Entity.MarketInfo;
+import com.kevinye.pojo.Entity.Upload;
 import com.kevinye.pojo.result.Result;
 import com.kevinye.server.service.DataService;
 import com.kevinye.utils.excelUtils.ExcelUtils;
 import com.kevinye.utils.excelUtils.excelHandlers.GoodsExcelHandler;
 import com.kevinye.utils.excelUtils.excelHandlers.MarketExcelHandler;
 import com.kevinye.utils.excelUtils.excelHandlers.SingleMarketDataHandler;
+import com.kevinye.utils.excelUtils.excelHandlers.StorageExcelHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.annotations.Delete;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController("AdminDataController")
@@ -22,12 +27,12 @@ public class DataController {
     private final DataService dataService;
     private final SingleMarketDataHandler singleMarketDataHandler;
     private final MarketExcelHandler marketExcelHandler;
-    private final GoodsExcelHandler goodsExcelHandler;
-    public DataController(DataService dataService, SingleMarketDataHandler singleMarketDataHandler, MarketExcelHandler marketExcelHandler, GoodsExcelHandler goodsExcelHandler) {
+    private final StorageExcelHandler storageExcelHandler;
+    public DataController(DataService dataService, SingleMarketDataHandler singleMarketDataHandler, MarketExcelHandler marketExcelHandler, GoodsExcelHandler goodsExcelHandler, StorageExcelHandler storageExcelHandler) {
         this.dataService = dataService;
         this.singleMarketDataHandler = singleMarketDataHandler;
         this.marketExcelHandler = marketExcelHandler;
-        this.goodsExcelHandler = goodsExcelHandler;
+        this.storageExcelHandler = storageExcelHandler;
     }
 
     @GetMapping("/market/all")
@@ -67,10 +72,8 @@ public class DataController {
     }
 
     @PostMapping("/upload")
-    public Result<String> importDailyData4Market(String excelUrl){
-        if(!excelUrl.startsWith("https://kevinye-web.oss-cn-hangzhou.aliyuncs.com.")){
-            return Result.success("不可上传非白名单url");
-        }
+    public Result<String> importDailyData4Market(@RequestBody ImportRequest rep){
+        String excelUrl = rep.getExcelUrl();
         try {
             ExcelUtils.downloadAndAnalyze(excelUrl,singleMarketDataHandler);
         } catch (IOException e) {
@@ -79,16 +82,22 @@ public class DataController {
         return Result.success("添加成功");
     }
 
-    @PostMapping("/uploadAll")
-    public Result<String> importMarketsOrMarketsData(String excelUrl ,Integer type){
-        if(!excelUrl.startsWith("https://kevinye-web.oss-cn-hangzhou.aliyuncs.com.")){
-            return Result.success("不可上传非白名单url");
-        }
+    @GetMapping("/allmarketinfo")
+    public Result<List<MarketInfo>> getAllMarketsInfo(LocalDate date){
+        List<MarketInfo> allMarketsInfo = dataService.getAllMarketsInfo(date);
+        return Result.success(allMarketsInfo);
+    }
+
+    @PostMapping("/uploadall")
+    public Result<String> importMarketsOrMarketsData(@RequestBody Upload upload){
+        String excelUrl = upload.getExcelUrl();
+
         try {
-            if (type == 1) {
+            Integer type = upload.getType();
+            if (type.equals(1)) {
                 ExcelUtils.downloadAndAnalyze(excelUrl, marketExcelHandler);
-            }else if (type == 2) {
-                ExcelUtils.downloadAndAnalyze(excelUrl, goodsExcelHandler);
+            }else if (type.equals(2)) {
+                ExcelUtils.downloadAndAnalyze(excelUrl, storageExcelHandler);
             }
 
         } catch (IOException e) {
@@ -96,4 +105,6 @@ public class DataController {
         }
         return Result.success("添加成功");
     }
+
+
 }

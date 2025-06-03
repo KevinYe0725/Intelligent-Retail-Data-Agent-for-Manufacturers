@@ -21,6 +21,7 @@ public class RecommendTasker implements Runnable {
 
     /**
      * 我不打算将其存入数据库中，首先它并不会减少太多IO，并且有利于之后的算法更迭
+     * 每次在结束上传时间的时候更新recommendation
      */
     @Override
     public void run() {

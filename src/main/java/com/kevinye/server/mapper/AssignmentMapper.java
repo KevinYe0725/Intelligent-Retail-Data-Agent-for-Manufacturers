@@ -17,7 +17,7 @@ public interface AssignmentMapper {
 
     List<Assignment> getAllAssignmentByIds(LocalDate date, List<Integer> ids);
 
-    @Select("select * from assignment where date =#{date}")
+    @Select("select id as assignmentId, content, market_id, good_id, status, date from assignment where date =#{date}")
     List<Assignment> getAllAssignments(LocalDate date);
 
     @Delete("delete from assignment where id = #{assignmentId}")
@@ -25,4 +25,6 @@ public interface AssignmentMapper {
 
     @Update("update assignment set status = #{status} where id = #{assignmentId}")
     void updateStatus(Integer assignmentId, Integer status);
+
+    void updateStatus4Storages(List<Assignment> assignmentList);
 }

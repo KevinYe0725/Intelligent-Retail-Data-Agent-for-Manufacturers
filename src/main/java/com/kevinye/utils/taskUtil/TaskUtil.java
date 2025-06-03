@@ -22,10 +22,10 @@ public class TaskUtil {
             case 2 -> timeSetting.getEndAfternoonTime();
             default -> Time;
         };
-        return String.format("%d %d %d * * ?",Time.getHour(),Time.getMinute(),Time.getSecond());
+        return String.format("%d %d %d * * ?",Time.getSecond(),Time.getMinute(),Time.getHour());
 
     }
     public String parseToCron(LocalTime Time){
-        return String.format("%d %d %d * * ?",Time.getHour(),Time.getMinute(),Time.getSecond());
+        return String.format("%d %d %d * * ?",Time.getSecond(),Time.getMinute(),Time.getHour());
     }
 }

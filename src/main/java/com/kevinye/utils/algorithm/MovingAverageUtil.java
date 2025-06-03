@@ -2,6 +2,8 @@ package com.kevinye.utils.algorithm;
 
 import com.kevinye.pojo.Entity.GoodData;
 import com.kevinye.pojo.VO.RecommendVO;
+import com.kevinye.pojo.constant.RecommendConstant;
+import com.kevinye.pojo.constant.WarningLineConstant;
 import com.kevinye.server.mapper.DataMapper;
 import org.springframework.stereotype.Component;
 
@@ -22,22 +24,45 @@ public class MovingAverageUtil {
      * @return 选择日期的recommend订单量，内包含对应品类预估值
      */
     public  List<RecommendVO> recommendOrders(Integer marketId, LocalDate endDate) {
+        //获取前七天的货品数据
+        //可不可能出现七天货品都为空的状态？
+        //只有可能是初始化的时候，不是，你连货品都没有，要什么推荐？
         LocalDate beginDate = endDate.minusDays(6);
         List<GoodData> goodDataList = dataMapper.selectAllData4Market(marketId,beginDate,endDate);
         List<GoodData> nowDayData = dataMapper.getData4Market(marketId,endDate);
         Map<Integer,List<GoodData>>goods = new HashMap<>();
         initialMap(goodDataList, goods);
         List<RecommendVO> answer = new ArrayList<>();
+        //遍历这个商店里所有的Good
+        if(goods.isEmpty()){
+            return answer;
+        }
         goods.forEach((goodId,goodsData)->{
-            double oldFactor = dataMapper.getFactor(endDate.minusDays(1),marketId,goodId);
+            //假如说这是一个加的货品或者前一天有货品没有更新factor，保证其健壮性
+            Double oldFactor = dataMapper.getFactor(endDate.minusDays(1),marketId,goodId);
+            if(oldFactor==null){
+                oldFactor= RecommendConstant.DEFAULT_FACTOR;
+            }
             double factor = SingleFactorParam(goodsData,oldFactor,marketId,endDate,goodId);
-            GoodData nowDayDatum = goodsData.getLast();
-            int recommendGoods = Integer.parseInt(String.valueOf(nowDayDatum.getInitialGoods()/oldFactor*factor).split("\\.")[0]);
-            RecommendVO recommendVO = new RecommendVO(nowDayDatum.getGoodId(),nowDayDatum.getGoodName(),nowDayDatum.getInitialGoods(), recommendGoods);
-            answer.add(recommendVO);
+            GoodData nowDayDatum = null;
+            for (GoodData nowDayGood : nowDayData) {
+                if(nowDayGood.getGoodId().equals(goodId)){
+                    nowDayDatum = nowDayGood;
+                }
+            }
+            if(nowDayDatum!=null){
+                double rawValue = nowDayDatum.getInitialGoods() / oldFactor * factor;
+                int recommendGoods = (int) Math.floor(rawValue);
+                RecommendVO recommendVO = new RecommendVO(nowDayDatum.getGoodId(),nowDayDatum.getGoodName(),nowDayDatum.getInitialGoods(), recommendGoods);
+                answer.add(recommendVO);
+            }
         });
+//        //前七天的数据都为空
+//        if(goods.isEmpty()){
+//            dataMapper.selectAllFactors4Markets(marketId,endDate.minusDays(1));
+//            dataMapper.updateAllFactors4Market(marketId,endDate);
+//        }
 
-        //获得前一天的factor
 
         return answer;
     }
@@ -73,24 +98,36 @@ public class MovingAverageUtil {
         double factor = oldFactor;
         double weightSum = 0;
         double[] weight = {1.0 ,0.6 ,0.2,0.5};
-
+        int invalidCount = 0;
         for (int[] goods : stock) {
+            if(goods[1]==-1||goods[2]==-1||goods[3]==-1){
+                invalidCount++;
+                continue;
+            }
             weightSum+=goods[1]==0?weight[0]:0;
             weightSum+=goods[2]==0?weight[1]:0;
             weightSum+=goods[3]==0?weight[2]:0;
             weightSum-=((double) (goods[0] - goods[3]) /goods[0])>=(factor-1)?weight[3]:0;
         }
-        double weightedOutOfStockRate = weightSum / 7;
 
-        if (weightedOutOfStockRate >= 0.6){
-            factor+=0.1;
-        }else if (weightedOutOfStockRate >= 0.2){
-            factor+=0.05;
-        } else if (weightedOutOfStockRate <= 0) {
-            factor-=0.1;
+        if(invalidCount<7){
+            double weightedOutOfStockRate = weightSum / (7-invalidCount);
+
+            if (weightedOutOfStockRate >= 0.6){
+                factor+=0.1;
+            }else if (weightedOutOfStockRate >= 0.2){
+                factor+=0.05;
+            } else if (weightedOutOfStockRate <= 0) {
+                factor-=0.1;
+            }
+            dataMapper.updateFactor(factor,marketId,now,goodId);
+            return factor;
+        }else {
+            factor = RecommendConstant.DEFAULT_FACTOR;
+            dataMapper.updateFactor(factor,marketId,now,goodId);
+            return factor;
         }
-        dataMapper.updateFactor(factor,marketId,now,goodId);
-        return factor;
+
     }
 
     /**
@@ -101,10 +138,11 @@ public class MovingAverageUtil {
     public void updateWarningLine(int marketId,LocalDate now){
         LocalDate begin = now.minusDays(30);
         Map<Integer,List<GoodData>>goods = new HashMap<>();
-
+        //获取前三十天的货品数据
         List<GoodData> goodDataList = dataMapper.selectAllData4Market(marketId, begin, now);
+        //initialMap将过去30天所有的品类都放进去，都会被更新
         initialMap(goodDataList, goods);
-
+        //将对该商店里的每一个商品的警戒线进行更新
         goods.forEach((goodId,goodsList) ->{
             int size = goodsList.size();
             int[][] stocks = new int[size][4];
@@ -121,42 +159,112 @@ public class MovingAverageUtil {
      * @param goodId goodId
      */
     private void updateSingleOne(int marketId, LocalDate now,int[][] stocks ,int goodId) {
-        double initialGoods = 0;
-        double noonGoods = 0;
-        double afternoonGoods = 0;
-        double noonWarningLine = 0;
-        double afternoonWarningLine = 0;
-        double nightWarningLine = 0;
-        int count = 0;
-        for (int[] goods : stocks) {
-            initialGoods += goods[0];
-            afternoonGoods += goods[2];
-            noonGoods += goods[1];
-            if (goods[3] == 0) {
-                noonWarningLine += goods[1];
-                afternoonWarningLine += goods[2];
-                count++;
-            }
-            nightWarningLine += goods[3];
-        }
-        if (count != 0) {
-            noonWarningLine /= count * 1.3;
-            afternoonWarningLine /= count * 1.2;
-        } else {
-            initialGoods /= 31;
-            nightWarningLine /= 31;
-            double averageOver = initialGoods - nightWarningLine;
-            double rate = averageOver / initialGoods;
-            noonWarningLine = noonGoods / rate * 1.3;
-            afternoonWarningLine = afternoonGoods / rate * 1.2;
+        //这个货品前三十天无数据（在这里不可能出现，没有该货品不会加到stocks）
+        if (stocks == null || stocks.length == 0) {
+            return;
         }
 
-        //将原本前一天开始，现在加入当前日期
-        now = now.plusDays(1);
-        if (dataMapper.getFactor(now, marketId, goodId) == null) {
-            dataMapper.insertWarningLine(noonWarningLine, afternoonWarningLine, nightWarningLine, now, marketId,goodId);
+        // 1. 累加过去几天的数据
+        double initialSum    = 0;
+        double noonSum       = 0;
+        double afternoonSum  = 0;
+        double nightSum      = 0;
+        double noonWarnAccum = 0;
+        double afterWarnAccum= 0;
+        int    countZeroNight= 0;
+
+        for (int[] goods : stocks) {
+            // goods = {initialGoods, noonGoods, afternoonGoods, nightGoods}
+            //假如有库存不存在，那么就跳过这一组
+            if(goods[0]==-1||goods[1]==-1||goods[2]==-1||goods[3]==-1){
+                continue;
+            }
+            initialSum    += goods[0];
+            noonSum       += goods[1];
+            afternoonSum  += goods[2];
+            nightSum      += goods[3];
+
+            if (goods[3] == 0) {
+                // 如果某天夜间就已经缺货，累计那天的午间和下午库存
+                noonWarnAccum     += goods[1];
+                afterWarnAccum    += goods[2];
+                countZeroNight++;
+            }
+        }
+
+        // 2. 先算出用于计算百分比的基准：这里示例用“最后一天”库存的 initialGoods
+        //    如果 stocks 中最后一个元素就是“今天”的库存，那它的 goods[0] 就是 todayInitial
+        int lastIndex = stocks.length - 1;
+        double todayInitial = (stocks[lastIndex][0] > 0 ? stocks[lastIndex][0] : 1.0);
+        // 如果你要用“过去 days 天平均初始库存”做基准：
+        // double avgInitial = initialSum / stocks.length;
+        // double todayInitial = (avgInitial > 0 ? avgInitial : 1.0);
+
+        // 3. 计算绝对值警戒线（跟之前逻辑一样）
+        double noonWarningLineAbs;
+        double afterWarningLineAbs;
+        double nightWarningLineAbs;
+
+        if (countZeroNight > 0) {
+            noonWarningLineAbs  = noonWarnAccum / (countZeroNight * 1.3);
+            afterWarningLineAbs = afterWarnAccum / (countZeroNight * 1.2);
         } else {
-            dataMapper.updateWarningLine(noonWarningLine, afternoonWarningLine, nightWarningLine, now, marketId,goodId);
+            // 如果过去天里没一次夜间缺货，就用均值法算绝对警戒线
+            double days = stocks.length;
+            double avgInitial = initialSum / days;
+            double avgNight   = nightSum / days;
+
+            if (avgInitial <= 0) {
+                //30天都有库存没填满
+                noonWarningLineAbs  = WarningLineConstant.NOON_WARNING_LINE;
+                afterWarningLineAbs = WarningLineConstant.AFTER_WARNING_LINE;
+            } else {
+                //其实没必要每次结束后更新，最好是每天结束后更新，保证这个晚上剩余存在
+                double averageOver = avgInitial - avgNight;
+                double rate = (averageOver > 0 ? (averageOver / avgInitial) : 1.0);
+                noonWarningLineAbs  = noonSum / (rate * 1.1);
+                afterWarningLineAbs = afternoonSum / (rate * 1.1);
+            }
+        }
+        // 夜间警戒线：可以直接取当日夜间均值，或者和以上逻辑保持一致
+        nightWarningLineAbs = WarningLineConstant.NIGHT_WARNING_LINE;
+
+        // 4. **把绝对值警戒线转成“百分比”**
+        //    比如 “午间警戒率” = noonWarningLineAbs / todayInitial
+        //    如果想要存储成 0~1 之间的小数，就直接存这个值；
+        //    如果想要存成 0~100 之间的百分数，就 ×100。
+        double noonWarningRateAbs = noonWarningLineAbs / todayInitial;        // 0 ~ +∞ 小数
+        double afterWarningRateAbs= afterWarningLineAbs / todayInitial;
+        double nightWarningRateAbs= nightWarningLineAbs / todayInitial;
+
+
+        // 5. 将日期挪到“明天”
+        LocalDate nextDay = now.plusDays(1);
+
+        // 6. 持久化“百分比”警戒线
+        //    这里假设数据库中 warning_line 表的三个字段类型都是 DOUBLE，
+        //    并且我们想存“百分比”数值（如 20.5 代表 20.5%），
+        //    那就把上面三个变量直接传给 Mapper：
+        if (dataMapper.getWarningLine(nextDay, marketId, goodId) == null) {
+            // 新增一行，插入百分比
+            dataMapper.insertWarningLine(
+                    noonWarningRateAbs,
+                    afterWarningRateAbs,
+                    nightWarningRateAbs,
+                    nextDay,
+                    marketId,
+                    goodId
+            );
+        } else {
+            // 更新已有行，保存新的百分比
+            dataMapper.updateWarningLine(
+                    noonWarningRateAbs,
+                    afterWarningRateAbs,
+                    nightWarningRateAbs,
+                    nextDay,
+                    marketId,
+                    goodId
+            );
         }
     }
 
@@ -168,10 +276,10 @@ public class MovingAverageUtil {
      */
     private static void extracted(List<GoodData> goodDataList, int[][] stock, int i) {
         for (GoodData goodData : goodDataList) {
-            stock[i][0] = goodData.getInitialGoods();
-            stock[i][1] = goodData.getNoonGoods();
-            stock[i][2] = goodData.getAfternoonGoods();
-            stock[i++][3] = goodData.getNightGoods();
+            stock[i][0] = goodData.getInitialGoods()==null?-1:goodData.getInitialGoods();
+            stock[i][1] = goodData.getNoonGoods()==null?-1:goodData.getNoonGoods();
+            stock[i][2] = goodData.getAfternoonGoods()==null?-1:goodData.getAfternoonGoods();
+            stock[i++][3] = goodData.getNightGoods()==null?-1:goodData.getNightGoods();
         }
     }
 

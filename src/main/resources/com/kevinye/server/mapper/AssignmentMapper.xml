@@ -8,6 +8,17 @@
             (#{assignment.content},#{assignment.marketId},#{assignment.goodId},#{assignment.date})
         </foreach>
     </insert>
+    <update id="updateStatus4Storages">
+        UPDATE storage
+        SET assignment_status = 1
+        WHERE (market_id, good_id, date)
+        IN
+        <foreach collection="assignmentList" item="assignment"
+                 open="(" separator="," close=")">
+            (#{assignment.marketId}, #{assignment.goodId}, #{assignment.date})
+        </foreach>
+    </update>
+
     <select id="getAllAssignmentByIds" resultType="com.kevinye.pojo.Entity.Assignment">
         select
             id as assignmentId,

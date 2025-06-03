@@ -2,6 +2,7 @@ package com.kevinye.server.service;
 
 import com.kevinye.pojo.Entity.GoodData;
 import com.kevinye.pojo.Entity.Market;
+import com.kevinye.pojo.Entity.MarketInfo;
 import com.kevinye.pojo.VO.RecommendVO;
 
 import java.time.LocalDate;
@@ -24,4 +25,6 @@ public interface DataService {
     void deleteMarkets(List<Integer> ids);
 
     void updateMarket(Market market);
+
+    List<MarketInfo> getAllMarketsInfo(LocalDate date);
 }

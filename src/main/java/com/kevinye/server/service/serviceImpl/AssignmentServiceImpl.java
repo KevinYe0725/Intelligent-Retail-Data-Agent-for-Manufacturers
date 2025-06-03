@@ -37,6 +37,7 @@ public class AssignmentServiceImpl implements AssignmentService {
             assignmentList.add(assignment);
         }
         assignmentMapper.addAssignmentList(assignmentList);
+        assignmentMapper.updateStatus4Storages(assignmentList);
     }
 
     @Override

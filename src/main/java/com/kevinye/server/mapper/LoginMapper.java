@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface LoginMapper {
-    @Select("select * from auditor where username = #{username} ")
+    @Select("select id as auditorId, auditor_name, username, phone, email, market_id, password from auditor where username = #{username} ")
     Auditor getAuditor(String username);
     @Select("select * from admin where username = #{username}")
     Admin getAdmin(String username);

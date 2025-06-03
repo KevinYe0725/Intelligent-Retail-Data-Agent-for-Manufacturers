@@ -78,6 +78,7 @@ public class MarketController {
     @GetMapping("/problems")
     public Result<List<Problem>> getProblem(Integer marketId){
         List<Problem> problems = marketService.getProblems(marketId);
+        log.info("问题列表：{}",problems);
         return Result.success(problems);
     }
 

@@ -30,8 +30,9 @@ public class StorageExcelHandler implements ExcelHandler {
         int indexOfDate = rowFirst.indexOf(MarketDataConstant.DATE);
         List<String> rowSecond = sheet.get(1);
         String s = rowSecond.get(indexOfDate);
-        LocalDate date = LocalDate.parse(s, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
+        DateTimeFormatter parser = DateTimeFormatter.ofPattern("yyyy.M.d");
+        LocalDate date = LocalDate.parse(s, parser);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         date = LocalDate.parse(date.format(formatter), formatter);
         for(int i = 1; i < rowFirst.size()-1; i++) {
             String GoodName = rowFirst.get(i);
@@ -50,7 +51,7 @@ public class StorageExcelHandler implements ExcelHandler {
                 throw new RuntimeException("存在商家不存在");
             }
             List<Storage> storageList4Market = new ArrayList<>();
-            for (int j = 1; j < row.size()-1; j++) {
+            for (int j = 1; j < row.size()-2; j++) {
                 if(row.get(j) == null|| row.get(j).isEmpty()) {
                     continue;
                 }

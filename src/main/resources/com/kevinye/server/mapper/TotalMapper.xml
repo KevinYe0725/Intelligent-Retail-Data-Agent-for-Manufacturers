@@ -48,13 +48,17 @@
         FROM
         storage s
         INNER JOIN goods g ON s.good_id = g.id
-        WHERE
-        <if test="goodId != null ">
-            s.good_id = #{goodId} AND
-        </if>
-        s.date BETWEEN #{beginDate} AND #{endDate}
+        <where>
+            <if test="goodId != null">
+                s.good_id = #{goodId}
+            </if>
+            <if test="beginDate != null and endDate != null">
+                AND s.date BETWEEN #{beginDate} AND #{endDate}
+            </if>
+        </where>
         GROUP BY s.date
     </select>
+
     <select id="getYearData" resultType="com.kevinye.pojo.Entity.MonthData">
         select
             MONTH(s.date) as month,

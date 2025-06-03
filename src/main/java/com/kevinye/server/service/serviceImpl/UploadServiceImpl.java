@@ -22,7 +22,11 @@ public class UploadServiceImpl implements UploadService {
         }
         uploadMapper.uploadRemainingByPeriod(uploadDTO);
         uploadDTO.setStorageId(uploadMapper.selectStorageIdByIds(uploadDTO));
-        uploadMapper.uploadAuditor(uploadDTO);
+        Integer APSId = uploadMapper.getAuditor(uploadDTO.getPeriod(), uploadDTO.getAuditorId(), uploadDTO.getStorageId());
+        if(APSId == null){
+            uploadMapper.uploadAuditor(uploadDTO);
+        }
+
         return true;
     }
 
@@ -33,6 +37,7 @@ public class UploadServiceImpl implements UploadService {
             return false;
         }
         uploadDTO.setStorageId(uploadMapper.selectStorageIdByIds(uploadDTO));
+
         Integer auditorId = uploadMapper.selectAuditorId(uploadDTO);
         if(auditorId == null||!auditorId .equals(uploadDTO.getAuditorId())){
             return false;

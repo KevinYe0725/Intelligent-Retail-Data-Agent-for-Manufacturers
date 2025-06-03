@@ -1,8 +1,6 @@
 package com.kevinye.server.mapper;
 
-import com.kevinye.pojo.Entity.GoodData;
-import com.kevinye.pojo.Entity.Market;
-import com.kevinye.pojo.Entity.WarningLine;
+import com.kevinye.pojo.Entity.*;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -31,14 +29,14 @@ public interface DataMapper {
     @Select("select  noon_warning_line, afternoon_warning_line, night_waring_line from recommendation where date = #{date} and market_id = #{marketId}")
     WarningLine getProblemLine(Integer marketId, LocalDate date);
 
-    @Update("update recommendation set  noon_warning_line = #{noonWarningLine} ,afternoon_warning_line = #{afternoonWaringLine} ,night_waring_line = #{nightWaringLine} where market_id = #{marketId} and date = #{now} and good_id = #{goodId}")
+    @Update("update recommendation set  noon_warning_line = #{noonWarningLine} ,afternoon_warning_line = #{afternoonWaringLine} ,night_waring_line = #{nightWaringLine} ,date = #{date} where market_id = #{marketId} and good_id = #{goodId}")
     void updateWarningLine( double noonWarningLine, double afternoonWarningLine, double nightWarningLine, LocalDate now, int marketId, Integer goodId);
 
     @Update("update recommendation set recommend_factor = #{factor} where good_id = #{goodId} and date = #{date} and market_id = #{marketId}")
-    void updateFactor(double factor, int marketId, LocalDate now, Integer goodId);
+    void updateFactor(double factor, int marketId, LocalDate date, Integer goodId);
 
 
-    void updateWarningStatus(List<GoodData> problemList, LocalDate date, Integer marketId);
+    void updateWarningStatus(List<GoodData> problems, LocalDate date, Integer marketId);
 
     @Update("update storage set status = 0 where market_id = #{marketId} and date = #{date}")
     void refreshWarningStatus(Integer marketId, LocalDate date);
@@ -51,4 +49,12 @@ public interface DataMapper {
                                    "email = #{email} " +
                                 "where id = #{id}")
     void updateMarket(Market market);
+
+    List<MarketInfo> getAllMarketsInfo(LocalDate date);
+
+    @Select("select id, recommend_factor, noon_warning_line, afternoon_warning_line, night_waring_line, date, market_id, good_id from recommendation ")
+    List<Factor> selectAllFactors4Markets(Integer marketId, LocalDate localDate);
+
+    @Select("select  noon_warning_line, afternoon_warning_line, night_waring_line from recommendation where date =#{nextDay} and market_id = #{marketId} and good_id = #{goodId}")
+    WarningLine getWarningLine(LocalDate nextDay, int marketId, int goodId);
 }

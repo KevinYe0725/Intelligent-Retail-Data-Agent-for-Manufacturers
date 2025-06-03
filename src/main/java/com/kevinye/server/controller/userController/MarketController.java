@@ -41,6 +41,7 @@ public class MarketController {
             return Result.error("不在提交时间段");
         }
         List<GoodVO> goods4Market = marketService.getGoods4Market(marketId, status, period);
+        log.info("goods4Market = {}", goods4Market);
         return Result.success(goods4Market);
     }
 

@@ -19,4 +19,7 @@ public interface UploadMapper {
 
     @Select("select auditorId from auditor_storage_date where period= #{period} and storageId = #{storageId}")
     Integer selectAuditorId(UploadDTO uploadDTO);
+
+    @Select("select id from auditor_storage_date where period = #{period} and auditorId = #{auditorId} and storageId = #{storageId}")
+    Integer getAuditor(Integer period, Integer auditorId, Integer storageId);
 }
