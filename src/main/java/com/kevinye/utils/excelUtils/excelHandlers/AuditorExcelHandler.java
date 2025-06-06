@@ -7,6 +7,7 @@ import com.kevinye.server.mapper.MarketMapper;
 import com.kevinye.server.service.MarketService;
 import com.kevinye.utils.excelUtils.ExcelHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ public class AuditorExcelHandler implements ExcelHandler {
         int indexOfPhone = firstRow.indexOf(AuditorConstant.PHONE);
         int indexOfUsername = firstRow.indexOf(AuditorConstant.USR_NAME);
         List<Auditor> auditors = new ArrayList<>();
+        List<Auditor> allAuditors = auditorMapper.getAllAuditors(null, null);
         for(int i=1;i<sheet.size();i++){
             List<String> row = sheet.get(i);
             Integer marketId = marketMapper.getMarketByName(row.get(indexOfMarketName)).getFirst().getId();
@@ -43,8 +45,18 @@ public class AuditorExcelHandler implements ExcelHandler {
                     row.get(indexOfPhone),
                     row.get(indexOfEmail),
                     row.get(indexOfUsername),
-                    row.get(indexOfPassword)
+                    DigestUtils.md5DigestAsHex(row.get(indexOfPassword).getBytes())
             );
+            int flag = 0;
+            for (Auditor allAuditor : allAuditors) {
+                if(allAuditor.getAuditorName().equals(auditor.getAuditorName())&&allAuditor.getMarketId().equals(auditor.getMarketId())){
+                    flag = 1;
+                    break;
+                }
+            }
+            if(flag==1){
+                continue;
+            }
             auditors.add(auditor);
         }
         if(!auditors.isEmpty()){

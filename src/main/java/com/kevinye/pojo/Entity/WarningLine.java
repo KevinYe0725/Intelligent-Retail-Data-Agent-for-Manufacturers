@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WarningLine {
+    private Integer goodId;
     private Double noonWarningLine;
     private Double afternoonWarningLine;
-    private Double nightWaringLine;
+    private Double nightWarningLine;
 }

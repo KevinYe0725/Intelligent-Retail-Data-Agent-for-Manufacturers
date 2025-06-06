@@ -9,6 +9,7 @@ import com.kevinye.server.service.AuditorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 
 import java.beans.Transient;
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ public class AuditorServiceImpl implements AuditorService {
             Map<Integer,String> matcher = new HashMap<>();
             markets.forEach(market -> matcher.put(market.getId(),market.getMarketName()));
             for (Auditor auditor : allAuditors) {
+                auditor.setPassword(DigestUtils.md5DigestAsHex(auditor.getPassword().getBytes()));
                 AuditorVO auditorVO = new AuditorVO(auditor.getAuditorId(),auditor.getMarketId(),matcher.get(auditor.getMarketId()),auditor.getAuditorName(),auditor.getPhone(),auditor.getEmail(),auditor.getUsername(),auditor.getPassword() );
                 auditorVOS.add(auditorVO);
             }
@@ -56,9 +58,10 @@ public class AuditorServiceImpl implements AuditorService {
 
     @Override
     public boolean addAuditor(Auditor auditor) {
-        if (auditor == null) {
+        if (auditor.getAuditorName()==null||auditor.getMarketId()==null||auditor.getUsername()==null||auditor.getPassword()==null) {
             return false;
         }
+        auditor.setPassword(DigestUtils.md5DigestAsHex(auditor.getPassword().getBytes()));
         auditorMapper.addAuditor(auditor);
         return true;
     }

@@ -58,6 +58,8 @@ public class AssignmentServiceImpl implements AssignmentService {
     @Override
     public void deleteAssignmentById(Integer assignmentId) {
         assignmentMapper.deleteAssignmentById(assignmentId);
+        Assignment assignmentById = assignmentMapper.getAssignmentById(assignmentId);
+        assignmentMapper.updateStatus4Storage(assignmentById);
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.kevinye.pojo.VO.TopGoodVO;
 import com.kevinye.pojo.VO.TopMarketVO;
 import com.kevinye.server.mapper.TotalMapper;
 import com.kevinye.server.service.TotalService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TotalServiceImpl implements TotalService {
     private final TotalMapper totalMapper;
     public TotalServiceImpl(TotalMapper totalMapper) {
@@ -59,12 +61,18 @@ public class TotalServiceImpl implements TotalService {
         if(lastMonthSales.isEmpty()||last2monthSales.isEmpty()){
             throw new RuntimeException("数据不足");
         }
-        for(int i = 0; i < lastMonthSales.size(); i++) {
-            MarketGrowth lastMonth = lastMonthSales.get(i);
-            MarketGrowth last2Month = last2monthSales.get(i);
-             lastMonth.setMonthGrowth((lastMonth.getMonthSales() - last2Month.getMonthSales()) / last2Month.getMonthSales());
+        for (MarketGrowth lastMonthSale : lastMonthSales) {
+            Integer marketId = lastMonthSale.getMarketId();
+            for (MarketGrowth last2monthSale : last2monthSales) {
+                if(last2monthSale.getMarketId().equals(marketId)){
+                    log.info("lastMonthSale :{},last2monthSale :{}", lastMonthSale, last2monthSale);
+                    lastMonthSale.setMonthGrowth((lastMonthSale.getMonthSales()-last2monthSale.getMonthSales())/last2monthSale.getMonthSales());
+                }
+            }
         }
-        lastMonthSales.sort((o1, o2) -> Double.compare(o2.getMonthGrowth(), o1.getMonthGrowth()));
+
+        lastMonthSales.removeIf(item->item.getMonthGrowth()==null);
+        lastMonthSales.sort((o1, o2) ->Double.compare(o2.getMonthGrowth(),o1.getMonthGrowth()));
         return lastMonthSales;
     }
 
@@ -79,11 +87,17 @@ public class TotalServiceImpl implements TotalService {
         if(monthSales4Goods.isEmpty()||monthSales4Goods1.isEmpty()){
             throw new RuntimeException("数据不足");
         }
-        for(int i = 0; i < monthSales4Goods.size(); i++) {
-            GoodGrowth monthSales4Good = monthSales4Goods.get(i);
-            GoodGrowth monthSales4Good1 = monthSales4Goods1.get(i);
-            monthSales4Good.setGrowth((monthSales4Good.getGoodSales()-monthSales4Good1.getGoodSales())/monthSales4Good1.getGoodSales());
+        for (GoodGrowth monthSales4Good : monthSales4Goods) {
+            Integer goodId = monthSales4Good.getGoodId();
+            for (GoodGrowth goodGrowth : monthSales4Goods1) {
+                if(goodGrowth.getGoodId().equals(goodId)) {
+                    log.info("monthSales4Good:{},goodGrowth:{}",monthSales4Good,goodGrowth);
+                    monthSales4Good.setGrowth((monthSales4Good.getGoodSales()-goodGrowth.getGoodSales())/goodGrowth.getGoodSales());
+                }
+            }
         }
+        monthSales4Goods.removeIf(item->item.getGrowth()==null);
+        log.info("monthSales4Goods:{}",monthSales4Goods);
         monthSales4Goods.sort((o1,o2) -> Double.compare(o2.getGrowth(), o1.getGrowth()));
         return monthSales4Goods;
     }

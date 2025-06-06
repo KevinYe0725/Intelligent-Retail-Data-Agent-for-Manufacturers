@@ -15,6 +15,26 @@
                 (#{market.marketName},#{market.address},#{market.phone},#{market.person},#{market.email})
             </foreach>
     </insert>
+    <update id="updateGoodInformation">
+        update storage
+        set
+            initial_goods = #{initialGoods},
+            noon_goods = #{noonGoods},
+            afternoon_goods = #{afternoonGoods},
+            night_goods = #{nightGoods}
+        where
+            market_id = #{marketId}
+          and
+            date = #{date} and good_id = #{goodId}
+    </update>
+
+    <update id="updateInitialGoods">
+        update storage
+        set
+            initial_goods = #{initialGoods}
+        where
+            id = #{id}
+    </update>
 
 
     <delete id="deleteMarkets">
@@ -115,6 +135,15 @@
                 good_name like concat('%',#{goodName},'%')
             </if>
         </where>
+    </select>
+    <select id="getStorage4Market" resultType="com.kevinye.pojo.Entity.Storage">
+        select id, market_id, good_id, initial_goods, noon_goods, afternoon_goods, night_goods, date, status, assignment_status
+        from storage
+        where
+            date = #{date}
+        and
+            market_id = #{marketId}
+
     </select>
 
 </mapper>

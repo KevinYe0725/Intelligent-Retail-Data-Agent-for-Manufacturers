@@ -23,6 +23,7 @@ public class MarketExcelHandler implements ExcelHandler {
         int indexOfPhone = rowFirst.indexOf(MarketConstant.PHONE);
         int indexOfEmail = rowFirst.indexOf(MarketConstant.EMAIL);
         int indexOfPerson = rowFirst.indexOf(MarketConstant.PERSON);
+        List<Market> allMarket = marketMapper.getAllMarket();
         List<Market> marketList = new ArrayList<>();
         for (int i = 1; i < sheet.size(); i++) {
             List<String> row = sheet.get(i);
@@ -33,6 +34,16 @@ public class MarketExcelHandler implements ExcelHandler {
                     row.get(indexOfEmail),
                     row.get(indexOfPerson)
             );
+            int flag = 0;
+            for (Market market1 : allMarket) {
+                if (market1.getMarketName().equals(market.getMarketName())) {
+                    flag = 1;
+                    break;
+                }
+            }
+            if (flag == 1) {
+                continue;
+            }
             marketList.add(market);
         }
         marketMapper.importNewMarkets(marketList);

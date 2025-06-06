@@ -38,15 +38,15 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public List<GoodData> getProblemData4Market(LocalDate date, Integer marketId) {
-        WarningLine problemLines = dataMapper.getProblemLine(marketId, date);
-        if (problemLines==null||problemLines.getNoonWarningLine()==null||problemLines.getAfternoonWarningLine()==null||problemLines.getNightWaringLine()==null) {
-            problemLines = new WarningLine(WarningLineConstant.NOON_WARNING_LINE,WarningLineConstant.AFTER_WARNING_LINE,WarningLineConstant.NOON_WARNING_LINE);
+        List<WarningLine> problemLines = dataMapper.getProblemLine(marketId, date);
+        for (WarningLine problemLine : problemLines) {
+            if(problemLine.getGoodId()!=null&&(problemLine.getNoonWarningLine()==null||problemLine.getAfternoonWarningLine()==null||problemLine.getNightWarningLine()==null)){
+                problemLine = new WarningLine(problemLine.getGoodId(),WarningLineConstant.NOON_WARNING_LINE,WarningLineConstant.AFTER_WARNING_LINE,WarningLineConstant.NIGHT_WARNING_LINE);
+            }
         }
         LocalDateTime now = LocalDateTime.now();
         LocalTime nowTime = now.toLocalTime();
-        double noonWarningLine =  problemLines.getNoonWarningLine();
-        double afternoonWarningLine = problemLines.getAfternoonWarningLine();
-        double nightWarningLine = problemLines.getNightWaringLine();
+
         PeriodSetting timeSetting = timeService.getTimeSetting();
         LocalTime endNoonTime = timeSetting.getEndNoonTime();
         LocalTime endAfternoonTime = timeSetting.getEndAfternoonTime();
@@ -54,10 +54,31 @@ public class DataServiceImpl implements DataService {
         Integer period = timeService.getTimePeriod(now);
         List<GoodData> problemList = new ArrayList<>();
         List<GoodData> goodDataList = dataMapper.getData4Market(marketId, date);
+        Double noonWarningLine = null;
+        Double afternoonWarningLine = null;
+        Double nightWarningLine = null;
         if(date.equals(LocalDate.now())){
             //假如晚于中午结束，早于下午结束，就使用中午警告
             if(nowTime.isAfter(endNoonTime)&&nowTime.isBefore(endAfternoonTime)){
                 for (GoodData goodData : goodDataList) {
+                    if(goodData.getNoonGoods()==null){
+                        continue;
+                    }
+                    int flag = 0;
+                    for (WarningLine problemLine : problemLines) {
+                        if (problemLine.getGoodId().equals(goodData.getGoodId())) {
+                            noonWarningLine = problemLine.getNoonWarningLine();
+                            afternoonWarningLine = problemLine.getAfternoonWarningLine();
+                            nightWarningLine = problemLine.getNightWarningLine();
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if(flag==0){
+                        noonWarningLine = WarningLineConstant.NOON_WARNING_LINE;
+                        afternoonWarningLine = WarningLineConstant.AFTER_WARNING_LINE;
+                        nightWarningLine=WarningLineConstant.NIGHT_WARNING_LINE;
+                    }
                     if (goodData.getNoonGoods()<=goodData.getInitialGoods()*noonWarningLine ) {
                         problemList.add(goodData);
                     }
@@ -65,6 +86,24 @@ public class DataServiceImpl implements DataService {
                 //到下午结束之后，使用下午警告
             }else if (nowTime.isAfter(endAfternoonTime) && nowTime.isBefore(endNightTime)) {
                 for (GoodData goodData : goodDataList) {
+                    if(goodData.getAfternoonGoods()==null){
+                        continue;
+                    }
+                    int flag = 0;
+                    for (WarningLine problemLine : problemLines) {
+                        if (problemLine.getGoodId().equals(goodData.getGoodId())) {
+                            noonWarningLine = problemLine.getNoonWarningLine();
+                            afternoonWarningLine = problemLine.getAfternoonWarningLine();
+                            nightWarningLine = problemLine.getNightWarningLine();
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if(flag==0){
+                        noonWarningLine = WarningLineConstant.NOON_WARNING_LINE;
+                        afternoonWarningLine = WarningLineConstant.AFTER_WARNING_LINE;
+                        nightWarningLine=WarningLineConstant.NIGHT_WARNING_LINE;
+                    }
                     if (goodData.getAfternoonGoods()<=goodData.getInitialGoods()*afternoonWarningLine ) {
                         problemList.add(goodData);
                     }
@@ -72,6 +111,24 @@ public class DataServiceImpl implements DataService {
                 //晚上结束之后，使用晚上警告
             }else if(nowTime.isAfter(endNightTime)) {
                 for (GoodData goodData : goodDataList) {
+                    if(goodData.getNightGoods()==null){
+                        continue;
+                    }
+                    int flag = 0;
+                    for (WarningLine problemLine : problemLines) {
+                        if (problemLine.getGoodId().equals(goodData.getGoodId())) {
+                            noonWarningLine = problemLine.getNoonWarningLine();
+                            afternoonWarningLine = problemLine.getAfternoonWarningLine();
+                            nightWarningLine = problemLine.getNightWarningLine();
+                            flag = 1;
+                            break;
+                        }
+                    }
+                    if(flag==0){
+                        noonWarningLine = WarningLineConstant.NOON_WARNING_LINE;
+                        afternoonWarningLine = WarningLineConstant.AFTER_WARNING_LINE;
+                        nightWarningLine=WarningLineConstant.NIGHT_WARNING_LINE;
+                    }
                     if (goodData.getNightGoods()<=goodData.getInitialGoods()*nightWarningLine ) {
                         problemList.add(goodData);
                     }
@@ -79,6 +136,24 @@ public class DataServiceImpl implements DataService {
             }
         }else {
             for (GoodData goodData : goodDataList) {
+                if(goodData.getNightGoods()==null){
+                    continue;
+                }
+                int flag = 0;
+                for (WarningLine problemLine : problemLines) {
+                    if (problemLine.getGoodId().equals(goodData.getGoodId())) {
+                        noonWarningLine = problemLine.getNoonWarningLine();
+                        afternoonWarningLine = problemLine.getAfternoonWarningLine();
+                        nightWarningLine = problemLine.getNightWarningLine();
+                        flag = 1;
+                        break;
+                    }
+                }
+                if(flag==0){
+                    noonWarningLine = WarningLineConstant.NOON_WARNING_LINE;
+                    afternoonWarningLine = WarningLineConstant.AFTER_WARNING_LINE;
+                    nightWarningLine=WarningLineConstant.NIGHT_WARNING_LINE;
+                }
                 if (goodData.getNightGoods()<=goodData.getInitialGoods()*nightWarningLine ) {
                     problemList.add(goodData);
                 }

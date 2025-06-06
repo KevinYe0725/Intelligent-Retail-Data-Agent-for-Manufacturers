@@ -10,8 +10,11 @@ import com.kevinye.pojo.constant.PeriodConstant;
 import com.kevinye.server.mapper.GoodMapper;
 import com.kevinye.server.mapper.MarketMapper;
 import com.kevinye.server.mapper.TimeMapper;
+import com.kevinye.server.service.DataService;
 import com.kevinye.server.service.MarketService;
 import com.kevinye.server.service.TimeService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,16 +26,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
 public class MarketServiceImpl implements MarketService {
 
-    private final MarketMapper marketMapper;
-    private final GoodMapper goodMapper;
-    private final TimeMapper timeMapper;
-    public MarketServiceImpl(MarketMapper marketMapper, GoodMapper goodMapper, TimeMapper timeMapper) {
-        this.marketMapper = marketMapper;
-        this.goodMapper = goodMapper;
-        this.timeMapper = timeMapper;
-    }
+    @Autowired
+    private  MarketMapper marketMapper;
+    @Autowired
+    private  GoodMapper goodMapper;
+    @Autowired
+    private  TimeMapper timeMapper;
+    @Autowired
+    private DataService dataService;
 
     @Override
     public MarketVO getMarketByAuditorId(Integer auditorId) {
@@ -130,7 +134,7 @@ public class MarketServiceImpl implements MarketService {
     @Override
     public void updateGoodInformation(GoodDataDTO goodDataDTO) {
         if(goodDataDTO.getInitialGoods()==null){
-            throw new RuntimeException("goodDataDTO不可为空");
+            throw new RuntimeException("订单不可为空");
         }
         marketMapper.updateGoodInformation(goodDataDTO);
     }
@@ -162,31 +166,63 @@ public class MarketServiceImpl implements MarketService {
 
     @Override
     public List<WarningVO> getWarningList(Integer marketId, LocalDate date) {
-        Integer period = PeriodConstant.NIGHT;
+        //flag检测是否为当天
+        int flag = 0;
+        List<GoodData> problemData4Market = dataService.getProblemData4Market(date, marketId);
+        log.error("problemData4Market={}",problemData4Market);
+
         if(date.equals(LocalDate.now()) ){
-            period = getRemainingPeriod(LocalTime.now());
+            flag = 1;
+
         }
-        if(period == -1){
+        LocalTime now = LocalTime.now();
+        PeriodSetting periodSetting = timeMapper.getPeriodSetting();
+        List<WarningVO> warningGoods = marketMapper.getWarningGoods(marketId, date);
+        if(warningGoods.isEmpty()){
             return new ArrayList<>();
         }
-        List<WarningVO> warningGoods = marketMapper.getWarningGoods(marketId, date);
         for (WarningVO warningGood : warningGoods) {
-            LocalDate beginDate = date.minusDays(7);
+            LocalDate beginDate = date.minusDays(6);
             Integer recentTimes = marketMapper.getCount(warningGood.getGoodId(), beginDate, date, marketId);
             warningGood.setRecentTimes(recentTimes);
-            Integer remaining = 0;
+            Integer remaining = null;
             String per = null;
-            if(period.equals(PeriodConstant.NOON)){
-                remaining = marketMapper.getNoonRemaining(marketId,date);
-                per = "中午";
-            }else if(period.equals(PeriodConstant.AFTERNOON)){
-                remaining =  marketMapper.getAfterNoonRemaining(marketId,date);
-                per = "下午";
-            }else if(period.equals(PeriodConstant.NIGHT)) {
-                remaining = marketMapper.getNightRemaining(marketId,date);
-                per = "晚上";
+            //是当天
+            if(flag == 1){
+                if(now.isBefore(periodSetting.getEndNoonTime())){
+                    break;
+                }else if (now.isBefore(periodSetting.getStartAfternoonTime() )) {
+                    remaining = marketMapper.getNoonRemaining(warningGood.getStorageId());
+                    per = "中午";
+                } else if (now.isBefore(periodSetting.getStartNightTime() )) {
+                    remaining = marketMapper.getAfterNoonRemaining(warningGood.getStorageId());
+                    per = "下午";
+                    if(remaining == null){
+                        remaining = marketMapper.getNoonRemaining(warningGood.getStorageId());
+                    }
+                } else{
+                    remaining = marketMapper.getNightRemaining(warningGood.getStorageId());
+                    per = "";
+                    if(remaining == null){
+                        remaining = marketMapper.getAfterNoonRemaining(warningGood.getStorageId());
+                    }
+                    if(remaining == null){
+                        remaining = marketMapper.getNoonRemaining(warningGood.getStorageId());
+                    }
+                }
+            }else {
+                    remaining = marketMapper.getNightRemaining(warningGood.getStorageId());
+                    per = "";
+                    if(remaining == null){
+                        remaining = marketMapper.getAfterNoonRemaining(warningGood.getStorageId());
+
+                    }
+                    if(remaining == null){
+                        remaining = marketMapper.getNoonRemaining(warningGood.getStorageId());
+                    }
+
             }
-            Double rate = (double)warningGood.getInitialGoods()/(double)remaining;
+            Double rate = (double)remaining/(double)warningGood.getInitialGoods();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 
             String time = date.format(formatter)+" "+per;

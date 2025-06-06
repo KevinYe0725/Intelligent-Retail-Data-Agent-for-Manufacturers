@@ -27,4 +27,8 @@ public interface AssignmentMapper {
     void updateStatus(Integer assignmentId, Integer status);
 
     void updateStatus4Storages(List<Assignment> assignmentList);
+    @Update("update storage set assignment_status = 0 where good_id = #{goodId} and market_id = #{marketId} and date = #{date}")
+    void updateStatus4Storage(Assignment assignmentId);
+    @Select("select id, content, market_id, good_id, status, date from assignment where id = #{assignmentId}")
+    Assignment getAssignmentById(Integer assignmentId);
 }

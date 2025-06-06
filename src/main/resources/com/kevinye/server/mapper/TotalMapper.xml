@@ -94,7 +94,7 @@
         select
             good_id,
             g.good_name,
-            sum(initial_goods*price)
+            sum(initial_goods*price) as good_sales
         from
             storage s
             inner join goods g on s.good_id = g.id

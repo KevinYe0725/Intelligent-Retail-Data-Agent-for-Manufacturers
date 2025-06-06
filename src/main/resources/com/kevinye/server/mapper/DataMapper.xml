@@ -10,6 +10,10 @@
         <foreach collection="problems" item="problem" separator="," close=")" open="(">
              #{problem.goodId}
         </foreach>
+        and
+            date = #{date}
+        and
+            market_id = #{marketId}
     </update>
     <select id="getAllMarketsInfo" resultType="com.kevinye.pojo.Entity.MarketInfo">
         select sm.id,

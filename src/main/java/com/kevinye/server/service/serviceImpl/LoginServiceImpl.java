@@ -38,10 +38,10 @@ public class LoginServiceImpl implements LoginService {
         if(auditor == null){
             throw new LoginException("账号不存在");
         }
-        //测试先不使用加密
-//        String password = DigestUtils.md5DigestAsHex(auditor.getPassword().getBytes());
+
+        String inputPassword = DigestUtils.md5DigestAsHex(loginDTO.getPassword().getBytes());
         String password = auditor.getPassword();
-        if(!password.equals(loginDTO.getPassword())) {
+        if(!password.equals(inputPassword)) {
             throw new LoginException("密码错误");
         }
         Map<String,Object> claims = new HashMap<>();
@@ -60,15 +60,25 @@ public class LoginServiceImpl implements LoginService {
         if(admin == null){
             throw new LoginException("账号不存在");
         }
-        //测试先不使用加密
-//        String password = DigestUtils.md5DigestAsHex(auditor.getPassword().getBytes());
+       String inputPassword = DigestUtils.md5DigestAsHex(loginDTO.getPassword().getBytes());
         String password = admin.getPassword();
-        if(!password.equals(loginDTO.getPassword())) {
+        if(!password.equals(inputPassword)) {
             throw new LoginException("密码错误");
         }
         Map<String,Object> claims = new HashMap<>();
         claims.put(JwtConstant.ADMIN_ID,admin.getId());
         String token = JwtUtils.createJWT(jwtProperties.getAdminSecretKey(), jwtProperties.getAdminTtl(), claims);
         return new LoginVO(token,admin.getId());
+    }
+
+    @Override
+    public void AdminLogin(Admin admin) {
+        if(admin.getUsername() == null || admin.getPassword() == null) {
+            throw new LoginException("存在数据为空");
+        }
+        String password = admin.getPassword();
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
+        loginMapper.newAdmin(admin.getUsername(),password);
+
     }
 }

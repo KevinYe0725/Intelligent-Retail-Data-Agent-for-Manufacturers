@@ -57,7 +57,7 @@ public interface MarketMapper {
      *  更新某天的货品数据
      * @param goodDataDTO 货品数据
      */
-    @Update("update storage set initial_goods = #{initialGoods},noon_goods = #{noonGoods},afternoon_goods = #{afternoonGoods},night_goods = #{nightGoods} where market_id = #{marketId} and date = #{date} and good_id = #{goodId}")
+
     void updateGoodInformation(GoodDataDTO goodDataDTO);
 
     /**
@@ -116,21 +116,16 @@ public interface MarketMapper {
             "    s.good_id,\n" +
             "    g.good_name,\n" +
             "    s.initial_goods,\n" +
-            "    a.auditor_name,\n" +
+            "    COALESCE(a.auditor_name, '管理员') AS auditor_name,\n" +
             "    s.assignment_status,\n" +
-            "    s.id as storageId \n" +
-            "FROM\n" +
-            "    storage s,\n" +
-            "    goods g,\n" +
-            "    auditor_storage_date asd,\n" +
-            "    auditor a\n" +
-            "WHERE\n" +
-            "    s.market_id = #{marketId}\n" +
-            "    AND s.date = #{date}\n" +
-            "    AND s.status = 1\n" +
-            "    AND s.good_id = g.id\n" +
-            "    AND asd.storageId = s.id\n" +
-            "    AND a.id = asd.auditorId\n ")
+            "    s.id AS storageId\n" +
+            "FROM storage s\n" +
+            "    JOIN goods g ON s.good_id = g.id\n" +
+            "    LEFT JOIN auditor_storage_date asd ON asd.storageId = s.id\n" +
+            "    LEFT JOIN auditor a ON a.id = asd.auditorId\n" +
+            "WHERE s.market_id = #{marketId}\n" +
+            "  AND s.date = #{date}\n" +
+            "  AND s.status = 1")
     List<WarningVO> getWarningGoods(Integer marketId, LocalDate date);
 
     /**
@@ -144,32 +139,17 @@ public interface MarketMapper {
     @Select("select count(*) from storage where date between #{beginDate} and #{endDate} and good_id = #{goodId} and market_id = #{marketId} and status = 1")
     Integer getCount(Integer goodId,LocalDate beginDate, LocalDate endDate, Integer marketId);
 
-    /**
-     * 获得中午库存
-     * @param marketId 商店ID
-     * @param date 日期
-     * @return 中午库存
-     */
-    @Select("select noon_goods from storage  where id = market_id and date = #{date}")
-    Integer getNoonRemaining(Integer marketId, LocalDate date);
 
-    /**
-     * 获得下午库存
-     * @param marketId 商店ID
-     * @param date 日期
-     * @return 下午库存
-     */
-    @Select("select afternoon_goods from storage  where id = market_id and date = #{date}")
-    Integer getAfterNoonRemaining(Integer marketId, LocalDate date);
+    @Select("select noon_goods from storage  where id = #{storageId}")
+    Integer getNoonRemaining(Integer storageId);
 
-    /**
-     * 获得晚上剩余库存
-     * @param marketId 商店ID
-     * @param date 日期
-     * @return 晚上剩余库存
-     */
-    @Select("select night_goods from storage  where id = market_id and date = #{date}")
-    Integer getNightRemaining(Integer marketId, LocalDate date);
+
+    @Select("select afternoon_goods from storage  where id = #{storageId}")
+    Integer getAfterNoonRemaining(Integer storageId);
+
+
+    @Select("select night_goods from storage  where id = #{storageId}")
+    Integer getNightRemaining(Integer storageId);
 
 
     List<Storage> getStorageByIds(List<Integer> storageIds);
@@ -188,4 +168,8 @@ public interface MarketMapper {
     void importNewMarkets(List<Market> marketList);
 
     List<DayData> getMonthData(LocalDate beginDate, LocalDate endDate, Integer marketId, Integer goodId);
+
+    List<Storage> getStorage4Market(Integer marketId, LocalDate date);
+
+    void updateInitialGoods(Storage storage);
 }

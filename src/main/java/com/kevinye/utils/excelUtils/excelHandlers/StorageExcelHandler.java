@@ -7,6 +7,7 @@ import com.kevinye.pojo.constant.MarketDataConstant;
 import com.kevinye.server.mapper.GoodMapper;
 import com.kevinye.server.mapper.MarketMapper;
 import com.kevinye.utils.excelUtils.ExcelHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class StorageExcelHandler implements ExcelHandler {
     private final MarketMapper marketMapper;
     private final GoodMapper goodMapper;
@@ -48,8 +50,10 @@ public class StorageExcelHandler implements ExcelHandler {
             List<Market> market = marketMapper.getMarketByName(MarketName);
             Market marketFirst = market.getFirst();
             if(market.isEmpty()) {
-                throw new RuntimeException("存在商家不存在");
+                throw new RuntimeException(marketFirst.getMarketName()+"不存在");
             }
+            List<Storage> storage4Market = marketMapper.getStorage4Market(market.getFirst().getId(), date);
+
             List<Storage> storageList4Market = new ArrayList<>();
             for (int j = 1; j < row.size()-2; j++) {
                 if(row.get(j) == null|| row.get(j).isEmpty()) {
@@ -58,9 +62,29 @@ public class StorageExcelHandler implements ExcelHandler {
                 int initialGoods = Integer.parseInt(row.get(j));
                 Integer goodId = goodIds.get(j);
                 Storage storage = new Storage(marketFirst.getId(),goodId,initialGoods,date);
+                int flag = 0;
+                if(!storage4Market.isEmpty()) {
+                    for (Storage storage1 : storage4Market) {
+                        log.info("storage1:{},storage:{} ",storage1,storage);
+                        if (storage1.getGoodId().equals(storage.getGoodId())) {
+                            storage.setId(storage1.getId());
+                            if (!storage1.getInitialGoods().equals(storage.getInitialGoods())) {
+                                marketMapper.updateInitialGoods(storage);
+                            }
+                            flag = 1;
+                        }
+                    }
+                }
+                if(flag == 1) {
+                    continue;
+                }
                 storageList4Market.add(storage);
             }
-            marketMapper.importNewStorage(storageList4Market);
+
+            if(!storageList4Market.isEmpty()) {
+                marketMapper.importNewStorage(storageList4Market);
+            }
+
         }
     }
 }

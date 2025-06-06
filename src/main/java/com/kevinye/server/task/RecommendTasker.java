@@ -5,12 +5,14 @@ package com.kevinye.server.task;
 import com.kevinye.pojo.Entity.Market;
 import com.kevinye.server.service.MarketService;
 import com.kevinye.utils.algorithm.MovingAverageUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
 
 
 @Component
+@Slf4j
 public class RecommendTasker implements Runnable {
     private final MovingAverageUtil movingAverageUtil;
     private final MarketService marketService;
@@ -26,6 +28,7 @@ public class RecommendTasker implements Runnable {
     @Override
     public void run() {
         LocalDate date = LocalDate.now();
+        log.error("经过了RecommendTasker");
         List<Market> allMarket = marketService.getAllMarket();
         for (Market market : allMarket) {
             Integer marketId = market.getId();
